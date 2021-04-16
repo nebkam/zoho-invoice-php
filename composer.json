@@ -1,0 +1,23 @@
+{
+  "name": "nebkam/zoho-invoice-php",
+  "description": "Unofficial Zoho Invoice PHP SDK",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Nebojša Kamber",
+      "email": "nebojsa.kamber@4zida.rs"
+    }
+  ],
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*",
+    "symfony/http-client-contracts": "^2.3",
+    "symfony/serializer": "^5.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Nebkam\\ZohoInvoice\\": "src"
+    }
+  }
+}
