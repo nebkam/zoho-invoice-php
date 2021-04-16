@@ -2,7 +2,6 @@
 
 namespace Nebkam\ZohoInvoice\Serializer;
 
-use Nebkam\ZohoInvoice\Helper;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
 class NotNullJsonEncode extends JsonEncode

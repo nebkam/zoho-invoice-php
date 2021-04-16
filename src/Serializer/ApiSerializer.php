@@ -4,7 +4,6 @@ namespace Nebkam\ZohoInvoice;
 
 use DateTimeZone;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Nebkam\ZohoInvoice\Exception\ZohoInvoiceTransferException;
 use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -45,7 +44,7 @@ class ApiSerializer
 	/**
 	 * @param object $object
 	 * @return string
-	 * @throws ZohoInvoiceTransferException
+	 * @throws ZohoInvoiceException
 	 */
 	public function serialize(object $object): string
 		{
@@ -55,7 +54,7 @@ class ApiSerializer
 			}
 		catch (ExceptionInterface $exception)
 			{
-			throw ZohoInvoiceTransferException::fromSerializationException($exception);
+			throw ZohoInvoiceException::fromExceptionInterface($exception);
 			}
 		}
 
@@ -63,7 +62,7 @@ class ApiSerializer
 	 * @param string $json
 	 * @param string $className
 	 * @return object|array
-	 * @throws ZohoInvoiceTransferException
+	 * @throws ZohoInvoiceException
 	 */
 	public function deserialize(string $json, string $className)
 		{
@@ -73,7 +72,7 @@ class ApiSerializer
 			}
 		catch (ExceptionInterface $exception)
 			{
-			throw ZohoInvoiceTransferException::fromSerializationException($exception);
+			throw ZohoInvoiceException::fromExceptionInterface($exception);
 			}
 		}
 	}

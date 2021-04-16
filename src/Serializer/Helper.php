@@ -1,6 +1,6 @@
 <?php
 
-namespace Nebkam\ZohoInvoice;
+namespace Nebkam\ZohoInvoice\Serializer;
 
 class Helper
 	{
