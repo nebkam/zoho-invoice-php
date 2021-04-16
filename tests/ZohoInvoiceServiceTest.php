@@ -1,11 +1,26 @@
 <?php
 
+use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Nebkam\ZohoInvoice\ZohoInvoiceService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 
 class ZohoInvoiceServiceTest extends TestCase
 	{
+	/**
+	 * @throws ZohoInvoiceException
+	 */
+	public function testGetInvoiceById(): void
+		{
+		$service = new ZohoInvoiceService(new NativeHttpClient(), getenv('ACCESS_TOKEN'));
+		$invoice = $service->getInvoice('11978000000311915');
+		self::assertEquals('inv000999', $invoice->getInvoiceNumber());
+		}
+
+	/**
+	 * @throws ZohoInvoiceException
+	 */
 	public function testParseInvoiceFromWebhook(): void
 		{
 		$service = new ZohoInvoiceService(new MockHttpClient(), getenv('ACCESS_TOKEN'));
