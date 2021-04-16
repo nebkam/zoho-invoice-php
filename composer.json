@@ -13,7 +13,6 @@
     "php": "^7.4",
     "ext-json": "*",
     "doctrine/annotations": "^1.12",
-    "nebkam/zoho-oauth-php": "^1.0",
     "phpdocumentor/reflection-docblock": "^5.2",
     "symfony/property-info": "^5.2",
     "symfony/property-access": "^5.2",
@@ -24,5 +23,9 @@
     "psr-4": {
       "Nebkam\\ZohoInvoice\\": "src"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "symfony/http-client": "^5.2"
   }
 }

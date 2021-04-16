@@ -1,10 +1,10 @@
 <?php
 
-namespace Nebkam\ZohoInvoice;
+namespace Nebkam\ZohoInvoice\Serializer;
 
 use DateTimeZone;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
+use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;

@@ -6,6 +6,9 @@ class CreateInvoiceWebhook
 	{
 	private Invoice $invoice;
 
+	/**
+	 * @return Invoice
+	 */
 	public function getInvoice(): Invoice
 		{
 		return $this->invoice;

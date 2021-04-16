@@ -19,6 +19,9 @@ class Invoice
 	 */
 	private array $lineItems;
 
+	/**
+	 * @return string
+	 */
 	public function getCustomerId(): string
 		{
 		return $this->customerId;
@@ -31,6 +34,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return string
+	 */
 	public function getSalespersonId(): string
 		{
 		return $this->salespersonId;
@@ -43,6 +49,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return string
+	 */
 	public function getInvoiceNumber(): string
 		{
 		return $this->invoiceNumber;
@@ -55,6 +64,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return string
+	 */
 	public function getReferenceNumber(): string
 		{
 		return $this->referenceNumber;
@@ -67,6 +79,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return float
+	 */
 	public function getDiscountPercent(): float
 		{
 		return $this->discountPercent;
@@ -79,6 +94,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return float
+	 */
 	public function getDiscountAmount(): float
 		{
 		return $this->discountAmount;
@@ -91,6 +109,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return float
+	 */
 	public function getTotal(): float
 		{
 		return $this->total;
@@ -103,6 +124,9 @@ class Invoice
 		return $this;
 		}
 
+	/**
+	 * @return DateTime
+	 */
 	public function getCreatedTime(): DateTime
 		{
 		return $this->createdTime;

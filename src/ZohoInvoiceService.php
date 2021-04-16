@@ -2,23 +2,36 @@
 
 namespace Nebkam\ZohoInvoice;
 
-use Nebkam\ZohoOAuth\ZohoOAuthResponse;
+use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\Invoice;
+use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ZohoInvoiceService
 	{
 	private ApiSerializer $serializer;
 	private HttpClientInterface $client;
-	private ?string $apiDomain;
 	private ?string $accessToken;
 
 	public function __construct(
 		HttpClientInterface $client,
-		ZohoOAuthResponse $credentials)
+		string $accessToken)
 		{
-		$this->serializer = new ApiSerializer();
+		$this->serializer  = new ApiSerializer();
 		$this->client      = $client;
-		$this->apiDomain   = $credentials->apiDomain;
-		$this->accessToken = $credentials->accessToken;
+		$this->accessToken = $accessToken;
+		}
+
+	/**
+	 * @param string $json
+	 * @return Invoice
+	 * @throws ZohoInvoiceException
+	 */
+	public function parseInvoiceFromWebhook(string $json): Invoice
+		{
+		/** @var CreateInvoiceWebhook $webhook */
+		$webhook = $this->serializer->deserialize($json, CreateInvoiceWebhook::class);
+
+		return $webhook->getInvoice();
 		}
 	}
