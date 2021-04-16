@@ -12,6 +12,11 @@
   "require": {
     "php": "^7.4",
     "ext-json": "*",
+    "doctrine/annotations": "^1.12",
+    "nebkam/zoho-oauth-php": "^1.0",
+    "phpdocumentor/reflection-docblock": "^5.2",
+    "symfony/property-info": "^5.2",
+    "symfony/property-access": "^5.2",
     "symfony/http-client-contracts": "^2.3",
     "symfony/serializer": "^5.2"
   },
