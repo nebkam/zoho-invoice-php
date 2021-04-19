@@ -4,7 +4,9 @@ namespace Nebkam\ZohoInvoice;
 
 use Nebkam\ZohoInvoice\Model\ApiResponse;
 use Nebkam\ZohoInvoice\Model\Contact;
+use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\GetContactPersonResponse;
 use Nebkam\ZohoInvoice\Model\GetContactResponse;
 use Nebkam\ZohoInvoice\Model\GetInvoiceResponse;
 use Nebkam\ZohoInvoice\Model\Invoice;
@@ -63,7 +65,45 @@ class ZohoInvoiceService
 	 */
 	public function deleteContact(string $id): ApiResponse
 		{
-		return $this->makeDeleteRequest('contacts/'.$id, ApiResponse::class);
+		return $this->makeDeleteRequest('contacts/'.$id);
+		}
+
+	/**
+	 * @param ContactPerson $contactPerson
+	 * @return ContactPerson
+	 * @throws ZohoInvoiceException
+	 */
+	public function createContactPerson(ContactPerson $contactPerson): ContactPerson
+		{
+		$response = $this->makePostRequest('contacts/contactpersons', $contactPerson, GetContactPersonResponse::class);
+		/** @var GetContactPersonResponse $response */
+		return $response->getContactPerson();
+		}
+
+	/**
+	 * @param string $contactId
+	 * @param string $contactPersonId
+	 * @return ContactPerson
+	 * @throws ZohoInvoiceException
+	 */
+	public function getContactPerson(string $contactId, string $contactPersonId): ContactPerson
+		{
+		$response = $this->makeGetRequest(
+			sprintf('contacts/%s/contactpersons/%s', $contactId, $contactPersonId),
+			GetContactPersonResponse::class
+		);
+		/** @var GetContactPersonResponse $response */
+		return $response->getContactPerson();
+		}
+
+	/**
+	 * @param string $id
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 */
+	public function deleteContactPerson(string $id): ApiResponse
+		{
+		return $this->makeDeleteRequest('contacts/contactpersons/'.$id);
 		}
 
 	/**
@@ -119,9 +159,9 @@ class ZohoInvoiceService
 	/**
 	 * @throws ZohoInvoiceException
 	 */
-	private function makeDeleteRequest(string $url, string $responseClass): ApiResponse
+	private function makeDeleteRequest(string $url): ApiResponse
 		{
-		return $this->makeRequest('DELETE', $url, [], $responseClass);
+		return $this->makeRequest('DELETE', $url, [], ApiResponse::class);
 		}
 
 	/**

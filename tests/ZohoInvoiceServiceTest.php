@@ -1,6 +1,7 @@
 <?php
 
 use Nebkam\ZohoInvoice\Model\Contact;
+use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Nebkam\ZohoInvoice\ZohoInvoiceService;
 use PHPUnit\Framework\TestCase;
@@ -11,7 +12,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	public function testInit(): ZohoInvoiceService
 		{
 		$service = new ZohoInvoiceService(new NativeHttpClient(), getenv('ACCESS_TOKEN'));
-		self::assertNotNull($service);
+		$this->assertNotNull($service);
 
 		return $service;
 		}
@@ -29,7 +30,7 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setContactName('Demo profil agencije2')
 			->setWebsite('https://4z.rs');
 		$contact = $service->createContact($data);
-		self::assertNotEmpty($contact->getContactId());
+		$this->assertNotEmpty($contact->getContactId());
 
 		return [
 			$service,
@@ -68,9 +69,71 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 		$loadedContact = $service->getContact($contact->getContactId());
-		self::assertEquals($contact->getContactName(), $loadedContact->getContactName());
-		self::assertEquals($contact->getCompanyName(), $loadedContact->getCompanyName());
-		self::assertEquals($contact->getWebsite(), $loadedContact->getWebsite());
+		$this->assertEquals($contact->getContactName(), $loadedContact->getContactName());
+		$this->assertEquals($contact->getCompanyName(), $loadedContact->getCompanyName());
+		$this->assertEquals($contact->getWebsite(), $loadedContact->getWebsite());
+		}
+
+	/**
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @return array
+	 * @throws ZohoInvoiceException
+	 */
+	public function testCreateContactPerson(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+		$contactPerson = (new ContactPerson())
+			->setContactId($contact->getContactId())
+			->setFirstName('Demo profil agencije2')
+			->setLastName('Kontakt')
+			->setEmail('demo.agencija.2@4z.rs');
+		$contactPerson = $service->createContactPerson($contactPerson);
+		$this->assertNotNull($contactPerson->getContactPersonId());
+
+		return [
+			$service,
+			$contactPerson
+		];
+		}
+
+	/**
+	 * @depends testCreateContactPerson
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testGetContactPerson(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contactPerson
+		 */
+		[$service, $contactPerson] = $params;
+		$loadedContactPerson = $service->getContactPerson(
+			$contactPerson->getContactId(),
+			$contactPerson->getContactPersonId()
+		);
+		$this->assertEquals($contactPerson->getEmail(), $loadedContactPerson->getEmail());
+		}
+
+	/**
+	 * @depends testCreateContactPerson
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testDeleteContactPerson(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contact
+		 */
+		[$service, $contact] = $params;
+		$result = $service->deleteContactPerson($contact->getContactPersonId());
+		$this->assertTrue($result->isSuccessful());
 		}
 
 	/**
@@ -86,7 +149,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 		$result = $service->deleteContact($contact->getContactId());
-		self::assertEquals(0, $result->getCode());
+		$this->assertTrue($result->isSuccessful());
 		}
 
 	/**
@@ -96,7 +159,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	public function testGetInvoiceById(ZohoInvoiceService $service): void
 		{
 		$invoice = $service->getInvoice('11978000000311915');
-		self::assertEquals('inv000999', $invoice->getInvoiceNumber());
+		$this->assertEquals('inv000999', $invoice->getInvoiceNumber());
 		}
 
 	/**
@@ -107,20 +170,20 @@ class ZohoInvoiceServiceTest extends TestCase
 		{
 		$json    = file_get_contents(__DIR__ . '/zoho_invoice_create_invoice.json');
 		$invoice = $service->parseInvoiceFromWebhook($json);
-		self::assertNotNull($invoice);
-		self::assertEquals('11978000001234119', $invoice->getCustomerId());
-		self::assertEquals('11978000001804003', $invoice->getSalespersonId());
-		self::assertEquals('inv013604', $invoice->getInvoiceNumber());
-		self::assertEquals('2003320', $invoice->getReferenceNumber());
-		self::assertEquals(15, $invoice->getDiscountPercent());
-		self::assertEquals(3750, $invoice->getDiscountAmount());
-		self::assertEquals(25500, $invoice->getTotal());
-		self::assertEquals('2020-12-21', $invoice->getCreatedTime()->format('Y-m-d'));
-		self::assertNotEmpty($invoice->getLineItems());
+		$this->assertNotNull($invoice);
+		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
+		$this->assertEquals('11978000001804003', $invoice->getSalespersonId());
+		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
+		$this->assertEquals('2003320', $invoice->getReferenceNumber());
+		$this->assertEquals(15, $invoice->getDiscountPercent());
+		$this->assertEquals(3750, $invoice->getDiscountAmount());
+		$this->assertEquals(25500, $invoice->getTotal());
+		$this->assertEquals('2020-12-21', $invoice->getCreatedTime()->format('Y-m-d'));
+		$this->assertNotEmpty($invoice->getLineItems());
 		$lineItem = $invoice->getLineItems()[0];
-		self::assertEquals('11978000000177482', $lineItem->getItemId());
-		self::assertEquals(25000, $lineItem->getRate());
-		self::assertEquals(1, $lineItem->getQuantity());
-		self::assertEquals(20, $lineItem->getTaxPercentage());
+		$this->assertEquals('11978000000177482', $lineItem->getItemId());
+		$this->assertEquals(25000, $lineItem->getRate());
+		$this->assertEquals(1, $lineItem->getQuantity());
+		$this->assertEquals(20, $lineItem->getTaxPercentage());
 		}
 	}
