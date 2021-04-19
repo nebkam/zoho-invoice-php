@@ -6,6 +6,9 @@ class GetContactResponse extends ApiResponse
 	{
 	private Contact $contact;
 
+	/**
+	 * @return Contact
+	 */
 	public function getContact(): Contact
 		{
 		return $this->contact;

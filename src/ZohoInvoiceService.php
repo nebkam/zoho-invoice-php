@@ -3,7 +3,9 @@
 namespace Nebkam\ZohoInvoice;
 
 use Nebkam\ZohoInvoice\Model\ApiResponse;
+use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\GetContactResponse;
 use Nebkam\ZohoInvoice\Model\GetInvoiceResponse;
 use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
@@ -30,13 +32,49 @@ class ZohoInvoiceService
 		}
 
 	/**
+	 * @param Contact $contact
+	 * @return Contact
+	 * @throws ZohoInvoiceException
+	 */
+	public function createContact(Contact $contact): Contact
+		{
+		$response = $this->makePostRequest('contacts', $contact, GetContactResponse::class);
+
+		/** @var GetContactResponse $response */
+		return $response->getContact();
+		}
+
+	/**
+	 * @param string $id
+	 * @return Contact
+	 * @throws ZohoInvoiceException
+	 */
+	public function getContact(string $id): Contact
+		{
+		$response = $this->makeGetRequest('contacts/'.$id, GetContactResponse::class);
+		/** @var GetContactResponse $response */
+		return $response->getContact();
+		}
+
+	/**
+	 * @param string $id
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 */
+	public function deleteContact(string $id): ApiResponse
+		{
+		return $this->makeDeleteRequest('contacts/'.$id, ApiResponse::class);
+		}
+
+	/**
 	 * @param string $id
 	 * @return Invoice
 	 * @throws ZohoInvoiceException
 	 */
 	public function getInvoice(string $id): Invoice
 		{
-		$response = $this->makeGetRequest('invoices/'.$id, GetInvoiceResponse::class);
+		$response = $this->makeGetRequest('invoices/' . $id, GetInvoiceResponse::class);
+
 		/** @var GetInvoiceResponse $response */
 		return $response->getInvoice();
 		}
@@ -55,17 +93,53 @@ class ZohoInvoiceService
 		}
 
 	/**
+	 * @param string $url
+	 * @param object $payload
+	 * @param string $responseClass
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 */
+	private function makePostRequest(string $url, object $payload, string $responseClass): ApiResponse
+		{
+		return $this->makeRequest('POST', $url, [
+			'body' => [
+				'JSONString' => $this->serializer->serialize($payload)
+			]
+		], $responseClass);
+		}
+
+	/**
 	 * @throws ZohoInvoiceException
 	 */
 	private function makeGetRequest(string $url, string $responseClass): ApiResponse
 		{
+		return $this->makeRequest('GET', $url, [], $responseClass);
+		}
+
+	/**
+	 * @throws ZohoInvoiceException
+	 */
+	private function makeDeleteRequest(string $url, string $responseClass): ApiResponse
+		{
+		return $this->makeRequest('DELETE', $url, [], $responseClass);
+		}
+
+	/**
+	 * @param string $method
+	 * @param string $url
+	 * @param array $options
+	 * @param string $responseClass
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 */
+	private function makeRequest(string $method, string $url, array $options, string $responseClass): ApiResponse
+		{
+		$options = array_merge($options, [
+			'headers' => $this->getHeaders()
+		]);
 		try
 			{
-			$response = $this->client->request('GET', self::BASE_URI.$url, [
-				'headers' => [
-					'Authorization' => sprintf('Zoho-oauthtoken %s', $this->accessToken)
-				]
-			]);
+			$response = $this->client->request($method, self::BASE_URI . $url, $options);
 			/** @var ApiResponse $apiResponse */
 			$apiResponse = $this->serializer->deserialize(
 				$response->getContent(),
@@ -78,9 +152,16 @@ class ZohoInvoiceService
 
 			return $apiResponse;
 			}
-		catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $exception)
+		catch (TransportExceptionInterface | ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface $exception)
 			{
 			throw ZohoInvoiceException::fromHttpClientException($exception);
 			}
+		}
+
+	private function getHeaders(): array
+		{
+		return [
+			'Authorization' => sprintf('Zoho-oauthtoken %s', $this->accessToken)
+		];
 		}
 	}
