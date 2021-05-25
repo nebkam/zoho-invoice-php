@@ -11,6 +11,8 @@ use Nebkam\ZohoInvoice\Model\GetContactResponse;
 use Nebkam\ZohoInvoice\Model\GetInvoiceResponse;
 use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
+use Nebkam\ZohoOAuth\ZohoOAuthException;
+use Nebkam\ZohoOAuth\ZohoOAuthService;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -22,21 +24,22 @@ class ZohoInvoiceService
 	private const BASE_URI = 'https://invoice.zoho.eu/api/v3/';
 	private ApiSerializer $serializer;
 	private HttpClientInterface $client;
-	private ?string $accessToken;
+	private ZohoOAuthService $authService;
 
 	public function __construct(
 		HttpClientInterface $client,
-		string $accessToken)
+		ZohoOAuthService $authService)
 		{
 		$this->serializer  = new ApiSerializer();
 		$this->client      = $client;
-		$this->accessToken = $accessToken;
+		$this->authService = $authService;
 		}
 
 	/**
 	 * @param Contact $contact
 	 * @return Contact
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function createContact(Contact $contact): Contact
 		{
@@ -50,6 +53,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @return Contact
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function getContact(string $id): Contact
 		{
@@ -62,6 +66,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function deleteContact(string $id): ApiResponse
 		{
@@ -72,6 +77,7 @@ class ZohoInvoiceService
 	 * @param ContactPerson $contactPerson
 	 * @return ContactPerson
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function createContactPerson(ContactPerson $contactPerson): ContactPerson
 		{
@@ -85,6 +91,7 @@ class ZohoInvoiceService
 	 * @param string $contactPersonId
 	 * @return ContactPerson
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function getContactPerson(string $contactId, string $contactPersonId): ContactPerson
 		{
@@ -100,6 +107,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function deleteContactPerson(string $id): ApiResponse
 		{
@@ -110,6 +118,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @return Invoice
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	public function getInvoice(string $id): Invoice
 		{
@@ -138,6 +147,7 @@ class ZohoInvoiceService
 	 * @param string $responseClass
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	private function makePostRequest(string $url, object $payload, string $responseClass): ApiResponse
 		{
@@ -150,6 +160,7 @@ class ZohoInvoiceService
 
 	/**
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	private function makeGetRequest(string $url, string $responseClass): ApiResponse
 		{
@@ -158,6 +169,7 @@ class ZohoInvoiceService
 
 	/**
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	private function makeDeleteRequest(string $url): ApiResponse
 		{
@@ -171,6 +183,7 @@ class ZohoInvoiceService
 	 * @param string $responseClass
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
 	 */
 	private function makeRequest(string $method, string $url, array $options, string $responseClass): ApiResponse
 		{
@@ -198,10 +211,14 @@ class ZohoInvoiceService
 			}
 		}
 
+	/**
+	 * @throws ZohoOAuthException
+	 * @return array
+	 */
 	private function getHeaders(): array
 		{
 		return [
-			'Authorization' => sprintf('Zoho-oauthtoken %s', $this->accessToken)
+			'Authorization' => sprintf('Zoho-oauthtoken %s', $this->authService->getCredentials()->accessToken)
 		];
 		}
 	}

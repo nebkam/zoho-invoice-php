@@ -8,7 +8,9 @@
   </coverage>
   <php>
     <ini name="error_reporting" value="-1"/>
-    <env name="ACCESS_TOKEN" value=""/>
+    <env name="CLIENT_ID" value=""/>
+    <env name="CLIENT_SECRET" value=""/>
+    <env name="CREDENTIALS_PATH" value=""/>
   </php>
   <testsuites>
     <testsuite name="Project Test Suite">

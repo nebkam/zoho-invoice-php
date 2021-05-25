@@ -3,6 +3,7 @@ composer.phar
 composer.lock
 
 .idea/
+credentials.json
 
 phpunit.xml
 .phpunit.result.cache
