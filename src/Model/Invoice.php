@@ -14,7 +14,7 @@ class Invoice
 	private float $discountAmount;
 	private float $total;
 	private DateTime $createdTime;
-	private DateTime $date;
+	private string $date;
 	/**
 	 * @var LineItem[]
 	 */
@@ -140,12 +140,12 @@ class Invoice
 		return $this;
 		}
 
-	public function getDate(): DateTime
+	public function getDate(): string
 		{
 		return $this->date;
 		}
 
-	public function setDate(DateTime $date): self
+	public function setDate(string $date): self
 		{
 		$this->date = $date;
 
