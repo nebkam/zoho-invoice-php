@@ -14,6 +14,7 @@ class Invoice
 	private float $discountAmount;
 	private float $total;
 	private DateTime $createdTime;
+	private DateTime $date;
 	/**
 	 * @var LineItem[]
 	 */
@@ -135,6 +136,18 @@ class Invoice
 	public function setCreatedTime(DateTime $createdTime): self
 		{
 		$this->createdTime = $createdTime;
+
+		return $this;
+		}
+
+	public function getDate(): DateTime
+		{
+		return $this->date;
+		}
+
+	public function setDate(DateTime $date): self
+		{
+		$this->date = $date;
 
 		return $this;
 		}
