@@ -3,6 +3,7 @@
 namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
+use Exception;
 
 class Invoice
 	{
@@ -143,6 +144,14 @@ class Invoice
 	public function getDate(): string
 		{
 		return $this->date;
+		}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getDateAsDateTime(): DateTime
+		{
+		return new DateTime($this->getDate());
 		}
 
 	public function setDate(string $date): self
