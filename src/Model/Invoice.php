@@ -5,7 +5,7 @@ namespace Nebkam\ZohoInvoice\Model;
 use DateTime;
 use Exception;
 
-class Invoice
+class Invoice implements AccountingDocument
 	{
 	private string $customerId;
 	private string $salespersonId;
