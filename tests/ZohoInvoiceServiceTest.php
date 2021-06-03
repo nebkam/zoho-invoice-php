@@ -43,7 +43,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group unit
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -55,6 +54,7 @@ class ZohoInvoiceServiceTest extends TestCase
 			getenv('CLIENT_SECRET'),
 			getenv('CREDENTIALS_PATH')
 		);
+		$auth->refreshAccessToken();
 		$service = new ZohoInvoiceService(new NativeHttpClient(), $auth);
 		$this->assertNotNull($service);
 
@@ -208,7 +208,6 @@ class ZohoInvoiceServiceTest extends TestCase
 
 	/**
 	 * @depends testInit
-	 * @group unit
 	 * @throws ZohoInvoiceException
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
