@@ -42,6 +42,10 @@ class ZohoInvoiceServiceTest extends TestCase
 		);
 		}
 
+	/**
+	 * @group unit
+	 * @return ZohoInvoiceService
+	 */
 	public function testInit(): ZohoInvoiceService
 		{
 		$auth    = new ZohoOAuthService(
@@ -204,6 +208,7 @@ class ZohoInvoiceServiceTest extends TestCase
 
 	/**
 	 * @depends testInit
+	 * @group unit
 	 * @throws ZohoInvoiceException
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
