@@ -18,7 +18,7 @@
     "symfony/property-access": "^5.2",
     "symfony/http-client-contracts": "^2.3",
     "symfony/serializer": "^5.2",
-    "nebkam/zoho-oauth-php": "^1.0"
+    "nebkam/zoho-oauth-php": "^2.0"
   },
   "autoload": {
     "psr-4": {
