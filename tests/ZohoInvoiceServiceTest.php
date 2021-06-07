@@ -199,6 +199,16 @@ class ZohoInvoiceServiceTest extends TestCase
 	/**
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
+	 */
+	public function testGetInvoiceById(ZohoInvoiceService $service): void
+		{
+		$invoice = $service->getInvoice('11978000000311915');
+		$this->assertEquals('inv000999', $invoice->getInvoiceNumber());
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
 	 * @throws Exception
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
@@ -206,6 +216,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$json    = file_get_contents(__DIR__ . '/invoice_webhook_payload.json');
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
+		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
 		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
 		$this->assertEquals(15, $invoice->getDiscountPercent());
 		$this->assertEquals(25500, $invoice->getTotal());
@@ -227,7 +238,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		{
 		$json = file_get_contents(__DIR__ . '/estimate_webhook_payload.json');
 		$estimate = $service->parseEstimateFromWebhook($json);
-		$this->assertEquals('177517000000038116', $estimate->getEstimateId());
+		$this->assertEquals('EST-000001', $estimate->getEstimateNumber());
 		$this->assertEquals('177517000000038027', $estimate->getCustomerId());
 		$this->assertEquals('2021-05-24', $estimate->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertEquals(0, $estimate->getDiscountPercent());
