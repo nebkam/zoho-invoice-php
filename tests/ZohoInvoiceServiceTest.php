@@ -199,16 +199,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	/**
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
-	 */
-	public function testGetInvoiceById(ZohoInvoiceService $service): void
-		{
-		$invoice = $service->getInvoice('11978000000311915');
-		$this->assertEquals('inv000999', $invoice->getInvoiceNumber());
-		}
-
-	/**
-	 * @depends testInit
-	 * @throws ZohoInvoiceException
+	 * @throws Exception
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
 		{
@@ -216,13 +207,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
 		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
-		$this->assertEquals('11978000001804003', $invoice->getSalespersonId());
-		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
-		$this->assertEquals('2003320', $invoice->getReferenceNumber());
 		$this->assertEquals(15, $invoice->getDiscountPercent());
-		$this->assertEquals(3750, $invoice->getDiscountAmount());
 		$this->assertEquals(25500, $invoice->getTotal());
-		$this->assertEquals('2020-12-21', $invoice->getCreatedTime()->format('Y-m-d'));
+		$this->assertEquals('2020-12-21', $invoice->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertNotEmpty($invoice->getLineItems());
 		$lineItem = $invoice->getLineItems()[0];
 		$this->assertEquals('11978000000177482', $lineItem->getItemId());
