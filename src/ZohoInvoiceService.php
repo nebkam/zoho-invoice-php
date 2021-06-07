@@ -5,7 +5,9 @@ namespace Nebkam\ZohoInvoice;
 use Nebkam\ZohoInvoice\Model\ApiResponse;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
+use Nebkam\ZohoInvoice\Model\CreateEstimateWebhook;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\GetContactPersonResponse;
 use Nebkam\ZohoInvoice\Model\GetContactResponse;
 use Nebkam\ZohoInvoice\Model\GetInvoiceResponse;
@@ -139,6 +141,19 @@ class ZohoInvoiceService
 		$webhook = $this->serializer->deserialize($json, CreateInvoiceWebhook::class);
 
 		return $webhook->getInvoice();
+		}
+
+	/**
+	 * @param string $json
+	 * @return Estimate
+	 * @throws ZohoInvoiceException
+	 */
+	public function parseEstimateFromWebhook(string $json): Estimate
+		{
+		/** @var CreateEstimateWebhook $webhook */
+		$webhook = $this->serializer->deserialize($json, CreateEstimateWebhook::class);
+
+		return $webhook->getEstimate();
 		}
 
 	/**

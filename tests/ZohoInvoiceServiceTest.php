@@ -212,7 +212,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
 		{
-		$json    = file_get_contents(__DIR__ . '/zoho_invoice_create_invoice.json');
+		$json    = file_get_contents(__DIR__ . '/invoice_webhook_payload.json');
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
 		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
@@ -229,5 +229,25 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(25000, $lineItem->getRate());
 		$this->assertEquals(1, $lineItem->getQuantity());
 		$this->assertEquals(20, $lineItem->getTaxPercentage());
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
+	public function testParseEstimateFromWebhook(ZohoInvoiceService $service): void
+		{
+		$json = file_get_contents(__DIR__ . '/estimate_webhook_payload.json');
+		$estimate = $service->parseEstimateFromWebhook($json);
+		$this->assertEquals('177517000000038116', $estimate->getEstimateId());
+		$this->assertEquals('177517000000038027', $estimate->getCustomerId());
+		$this->assertEquals('2021-05-24', $estimate->getDateAsDateTime()->format('Y-m-d'));
+		$this->assertEquals(0, $estimate->getDiscountPercent());
+		$this->assertEquals(1200, $estimate->getTotal());
+		$lineItem = $estimate->getLineItems()[0];
+		$this->assertEquals('177517000000038084', $lineItem->getItemId());
+		$this->assertEquals(1000, $lineItem->getRate());
+		$this->assertEquals(1, $lineItem->getQuantity());
 		}
 	}
