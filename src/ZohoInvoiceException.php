@@ -12,6 +12,11 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class ZohoInvoiceException extends Exception
 	{
+	public static function fromDateTimeException(Exception $exception): self
+		{
+		return new self($exception->getMessage(), $exception->getCode(), $exception);
+		}
+
 	public static function fromExceptionInterface(ExceptionInterface $exception): self
 		{
 		return new self($exception->getMessage(), $exception->getCode(), $exception);

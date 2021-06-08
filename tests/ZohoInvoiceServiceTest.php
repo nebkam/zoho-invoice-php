@@ -257,6 +257,19 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @throws ZohoInvoiceException
 	 * @throws Exception
 	 */
+	public function testParseEstimateFromWebhookInvalidDate(ZohoInvoiceService $service): void
+		{
+		$this->expectException(ZohoInvoiceException::class);
+		$this->expectExceptionMessageMatches('/date/');
+		$json = file_get_contents(__DIR__ . '/webhook_payloads/estimate_invalid_date.json');
+		$service->parseEstimateFromWebhook($json);
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
 	public function testParseEstimateFromWebhook(ZohoInvoiceService $service): void
 		{
 		$json     = file_get_contents(__DIR__ . '/webhook_payloads/estimate.json');

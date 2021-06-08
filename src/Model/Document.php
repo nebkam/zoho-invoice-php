@@ -4,6 +4,7 @@ namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
 use Exception;
+use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 abstract class Document
@@ -25,6 +26,7 @@ abstract class Document
 	private ?float $total;
 	/**
 	 * @Assert\NotNull()
+	 * @Assert\Date()
 	 * @var string|null
 	 */
 	private ?string $date;
@@ -76,11 +78,18 @@ abstract class Document
 		}
 
 	/**
-	 * @throws Exception
+	 * @throws ZohoInvoiceException
 	 */
 	public function getDateAsDateTime(): ?DateTime
 		{
-		return $this->date !== null ? new DateTime($this->getDate()) : null;
+		try
+			{
+			return $this->date !== null ? new DateTime($this->getDate()) : null;
+			}
+		catch (Exception $e)
+			{
+			throw ZohoInvoiceException::fromDateTimeException($e);
+			}
 		}
 
 	public function setDate(?string $date): self
