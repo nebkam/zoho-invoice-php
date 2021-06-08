@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ZohoInvoiceServiceTest extends TestCase
 	{
@@ -42,12 +44,17 @@ class ZohoInvoiceServiceTest extends TestCase
 		);
 		}
 
-	/**
-	 * @return ZohoInvoiceService
-	 */
-	public function testInit(): ZohoInvoiceService
+	private static function createValidator(): ValidatorInterface
 		{
-		$auth    = new ZohoOAuthService(
+		return Validation::createValidatorBuilder()
+			->enableAnnotationMapping(true)
+			->addDefaultDoctrineAnnotationReader()
+			->getValidator();
+		}
+
+	private static function createAuth(): ZohoOAuthService
+		{
+		$auth = new ZohoOAuthService(
 			new NativeHttpClient(),
 			self::createSerializer(),
 			getenv('CLIENT_ID'),
@@ -55,7 +62,20 @@ class ZohoInvoiceServiceTest extends TestCase
 			getenv('CREDENTIALS_PATH')
 		);
 		$auth->refreshAccessToken();
-		$service = new ZohoInvoiceService(new NativeHttpClient(), $auth);
+
+		return $auth;
+		}
+
+	/**
+	 * @return ZohoInvoiceService
+	 */
+	public function testInit(): ZohoInvoiceService
+		{
+		$service = new ZohoInvoiceService(
+			new NativeHttpClient(),
+			self::createValidator(),
+			self::createAuth()
+		);
 		$this->assertNotNull($service);
 
 		return $service;
@@ -211,6 +231,52 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @throws ZohoInvoiceException
 	 * @throws Exception
 	 */
+	public function testParseEstimateFromWebhookNoLineItems(ZohoInvoiceService $service): void
+		{
+		$this->expectException(ZohoInvoiceException::class);
+		$this->expectExceptionMessageMatches('/lineItems/');
+		$json = file_get_contents(__DIR__ . '/webhook_payloads/estimate_no_line_items.json');
+		$service->parseEstimateFromWebhook($json);
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
+	public function testParseEstimateFromWebhookNoDate(ZohoInvoiceService $service): void
+		{
+		$this->expectException(ZohoInvoiceException::class);
+		$this->expectExceptionMessageMatches('/date/');
+		$json = file_get_contents(__DIR__ . '/webhook_payloads/estimate_no_date.json');
+		$service->parseEstimateFromWebhook($json);
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
+	public function testParseEstimateFromWebhook(ZohoInvoiceService $service): void
+		{
+		$json     = file_get_contents(__DIR__ . '/webhook_payloads/estimate.json');
+		$estimate = $service->parseEstimateFromWebhook($json);
+		$this->assertEquals('EST-000001', $estimate->getEstimateNumber());
+		$this->assertEquals('177517000000038027', $estimate->getCustomerId());
+		$this->assertEquals('2021-05-24', $estimate->getDateAsDateTime()->format('Y-m-d'));
+		$this->assertEquals(0, $estimate->getDiscountPercent());
+		$this->assertEquals(1200, $estimate->getTotal());
+		$lineItem = $estimate->getLineItems()[0];
+		$this->assertEquals('177517000000038084', $lineItem->getItemId());
+		$this->assertEquals(1000, $lineItem->getRate());
+		$this->assertEquals(1, $lineItem->getQuantity());
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
 		{
 		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice.json');
@@ -227,25 +293,5 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(25000, $lineItem->getRate());
 		$this->assertEquals(1, $lineItem->getQuantity());
 		$this->assertEquals(20, $lineItem->getTaxPercentage());
-		}
-
-	/**
-	 * @depends testInit
-	 * @throws ZohoInvoiceException
-	 * @throws Exception
-	 */
-	public function testParseEstimateFromWebhook(ZohoInvoiceService $service): void
-		{
-		$json = file_get_contents(__DIR__ . '/webhook_payloads/estimate.json');
-		$estimate = $service->parseEstimateFromWebhook($json);
-		$this->assertEquals('EST-000001', $estimate->getEstimateNumber());
-		$this->assertEquals('177517000000038027', $estimate->getCustomerId());
-		$this->assertEquals('2021-05-24', $estimate->getDateAsDateTime()->format('Y-m-d'));
-		$this->assertEquals(0, $estimate->getDiscountPercent());
-		$this->assertEquals(1200, $estimate->getTotal());
-		$lineItem = $estimate->getLineItems()[0];
-		$this->assertEquals('177517000000038084', $lineItem->getItemId());
-		$this->assertEquals(1000, $lineItem->getRate());
-		$this->assertEquals(1, $lineItem->getQuantity());
 		}
 	}

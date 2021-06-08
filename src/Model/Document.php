@@ -4,14 +4,32 @@ namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
 use Exception;
+use Symfony\Component\Validator\Constraints as Assert;
 
 abstract class Document
 	{
+	/**
+	 * @Assert\NotBlank()
+	 * @var string|null
+	 */
 	private ?string $customerId;
+	/**
+	 * @Assert\NotNull()
+	 * @var float|null
+	 */
 	private ?float $discountPercent;
+	/**
+	 * @Assert\NotBlank()
+	 * @var float|null
+	 */
 	private ?float $total;
+	/**
+	 * @Assert\NotNull()
+	 * @var string|null
+	 */
 	private ?string $date;
 	/**
+	 * @Assert\NotBlank()
 	 * @var LineItem[]
 	 */
 	private array $lineItems;

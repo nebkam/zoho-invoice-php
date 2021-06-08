@@ -15,6 +15,7 @@ use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
 use Nebkam\ZohoOAuth\ZohoOAuthException;
 use Nebkam\ZohoOAuth\ZohoOAuthService;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -26,14 +27,17 @@ class ZohoInvoiceService
 	private const BASE_URI = 'https://invoice.zoho.eu/api/v3/';
 	private ApiSerializer $serializer;
 	private HttpClientInterface $client;
+	private ValidatorInterface $validator;
 	private ZohoOAuthService $authService;
 
 	public function __construct(
 		HttpClientInterface $client,
+		ValidatorInterface $validator,
 		ZohoOAuthService $authService)
 		{
 		$this->serializer  = new ApiSerializer();
 		$this->client      = $client;
+		$this->validator   = $validator;
 		$this->authService = $authService;
 		}
 
@@ -59,7 +63,8 @@ class ZohoInvoiceService
 	 */
 	public function getContact(string $id): Contact
 		{
-		$response = $this->makeGetRequest('contacts/'.$id, GetContactResponse::class);
+		$response = $this->makeGetRequest('contacts/' . $id, GetContactResponse::class);
+
 		/** @var GetContactResponse $response */
 		return $response->getContact();
 		}
@@ -72,7 +77,7 @@ class ZohoInvoiceService
 	 */
 	public function deleteContact(string $id): ApiResponse
 		{
-		return $this->makeDeleteRequest('contacts/'.$id);
+		return $this->makeDeleteRequest('contacts/' . $id);
 		}
 
 	/**
@@ -84,6 +89,7 @@ class ZohoInvoiceService
 	public function createContactPerson(ContactPerson $contactPerson): ContactPerson
 		{
 		$response = $this->makePostRequest('contacts/contactpersons', $contactPerson, GetContactPersonResponse::class);
+
 		/** @var GetContactPersonResponse $response */
 		return $response->getContactPerson();
 		}
@@ -101,6 +107,7 @@ class ZohoInvoiceService
 			sprintf('contacts/%s/contactpersons/%s', $contactId, $contactPersonId),
 			GetContactPersonResponse::class
 		);
+
 		/** @var GetContactPersonResponse $response */
 		return $response->getContactPerson();
 		}
@@ -113,7 +120,7 @@ class ZohoInvoiceService
 	 */
 	public function deleteContactPerson(string $id): ApiResponse
 		{
-		return $this->makeDeleteRequest('contacts/contactpersons/'.$id);
+		return $this->makeDeleteRequest('contacts/contactpersons/' . $id);
 		}
 
 	/**
@@ -140,7 +147,7 @@ class ZohoInvoiceService
 		/** @var CreateInvoiceWebhook $webhook */
 		$webhook = $this->serializer->deserialize($json, CreateInvoiceWebhook::class);
 
-		return $webhook->getInvoice();
+		return $this->validate($webhook->getInvoice());
 		}
 
 	/**
@@ -151,9 +158,25 @@ class ZohoInvoiceService
 	public function parseEstimateFromWebhook(string $json): Estimate
 		{
 		/** @var CreateEstimateWebhook $webhook */
-		$webhook = $this->serializer->deserialize($json, CreateEstimateWebhook::class);
+		$webhook  = $this->serializer->deserialize($json, CreateEstimateWebhook::class);
 
-		return $webhook->getEstimate();
+		return $this->validate($webhook->getEstimate());
+		}
+
+	/**
+	 * @param Invoice|Estimate
+	 * @return Invoice|Estimate
+	 * @throws ZohoInvoiceException
+	 */
+	private function validate($document)
+		{
+		$errors = $this->validator->validate($document);
+		if (count($errors) > 0)
+			{
+			throw new ZohoInvoiceException(sprintf('Validation failed: %s', (string)$errors));
+			}
+
+		return $document;
 		}
 
 	/**
@@ -227,8 +250,8 @@ class ZohoInvoiceService
 		}
 
 	/**
-	 * @throws ZohoOAuthException
 	 * @return array
+	 * @throws ZohoOAuthException
 	 */
 	private function getHeaders(): array
 		{
