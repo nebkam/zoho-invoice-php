@@ -19,8 +19,8 @@
     "symfony/http-client-contracts": "^2.3",
     "symfony/serializer": "^5.2",
     "nebkam/zoho-oauth-php": "^2.0",
-    "symfony/validator": "^5.3",
-    "symfony/cache": "^5.3"
+    "symfony/validator": "^5.2",
+    "symfony/cache": "^5.2"
   },
   "autoload": {
     "psr-4": {
