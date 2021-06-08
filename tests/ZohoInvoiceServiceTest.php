@@ -213,7 +213,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
 		{
-		$json    = file_get_contents(__DIR__ . '/invoice_webhook_payload.json');
+		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice.json');
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
 		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
@@ -236,7 +236,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testParseEstimateFromWebhook(ZohoInvoiceService $service): void
 		{
-		$json = file_get_contents(__DIR__ . '/estimate_webhook_payload.json');
+		$json = file_get_contents(__DIR__ . '/webhook_payloads/estimate.json');
 		$estimate = $service->parseEstimateFromWebhook($json);
 		$this->assertEquals('EST-000001', $estimate->getEstimateNumber());
 		$this->assertEquals('177517000000038027', $estimate->getCustomerId());
