@@ -1,4 +1,4 @@
-Unofficial PHP SDK for Zoho Invoice API
+## Unofficial PHP SDK for Zoho Invoice API (Archived) ##
 
 Work on this repository is discontinued,
 
