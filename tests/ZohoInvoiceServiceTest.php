@@ -296,6 +296,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
 		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
+		$this->assertEquals('11978000003358020', $invoice->getInvoiceId());
 		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
 		$this->assertEquals(15, $invoice->getDiscountPercent());
 		$this->assertEquals(25500, $invoice->getTotal());

@@ -12,6 +12,12 @@ class Invoice extends Document
 	 */
 	private ?string $invoiceNumber;
 
+	/**
+	 * @Assert\NotBlank()
+	 * @var string|null
+	 */
+	private ?string $invoiceId;
+
 	public function getInvoiceNumber(): ?string
 		{
 		return $this->invoiceNumber;
@@ -20,6 +26,19 @@ class Invoice extends Document
 	public function setInvoiceNumber(?string $invoiceNumber): self
 		{
 		$this->invoiceNumber = $invoiceNumber;
+
+		return $this;
+		}
+
+	public function getInvoiceId(): ?string
+		{
+		return $this->invoiceId;
+		}
+
+
+	public function setInvoiceId(?string $invoiceId): self
+		{
+		$this->invoiceId = $invoiceId;
 
 		return $this;
 		}
