@@ -18,7 +18,7 @@ abstract class Document
 	 * @Assert\NotNull()
 	 * @var float|null
 	 */
-	private ?float $discountPercent;
+	private ?float $discountPercent = 0.0;
 	/**
 	 * @Assert\NotBlank()
 	 * @var float|null
@@ -105,6 +105,20 @@ abstract class Document
 	public function getLineItems(): array
 		{
 		return $this->lineItems;
+		}
+
+	/**
+	 * @return LineItem[]
+	 */
+	public function getLineItemsWithDiscount(): array
+		{
+		$lineItems = [];
+		foreach ($this->lineItems as $item)
+			{
+			$lineItems[] = $item->setDiscountPercentage($this->getDiscountPercent());
+			}
+
+		return $lineItems;
 		}
 
 	/**

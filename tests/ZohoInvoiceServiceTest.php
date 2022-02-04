@@ -67,6 +67,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group webhook-parse-invoice
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -286,6 +287,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group webhook-parse-invoice
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
 	 * @throws Exception
@@ -302,10 +304,15 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(25500, $invoice->getTotal());
 		$this->assertEquals('2020-12-21', $invoice->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertNotEmpty($invoice->getLineItems());
-		$lineItem = $invoice->getLineItems()[0];
+		$lineItem = $invoice->getLineItemsWithDiscount()[0];
 		$this->assertEquals('11978000000177482', $lineItem->getItemId());
 		$this->assertEquals(25000, $lineItem->getRate());
 		$this->assertEquals(1, $lineItem->getQuantity());
 		$this->assertEquals(20, $lineItem->getTaxPercentage());
+		$this->assertEquals(21250.0, $lineItem->getPriceWithDiscount());
+		$this->assertEquals(25500.0, $lineItem->getPriceWithTax());
+		$this->assertEquals(21250.0, $lineItem->getValueWithDiscount()); /** Value is the same since the quantity is 1 */
+		$this->assertEquals(25500.0, $lineItem->getValueWithTax());  /** Value is the same since the quantity is 1 */
+
 		}
 	}
