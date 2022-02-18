@@ -8,21 +8,42 @@ class LineItem
 	private float $rate;
 	private float $taxPercentage;
 	private float $quantity;
-	private float $discountPercentage;
+	private ?string $discount;
+	private float $itemTotal;
 
-	public function __construct(float $discountPercentage = 0.0)
+	public function __construct()
 		{
-		$this->discountPercentage = $discountPercentage;
+		}
+
+	public function getDiscount(): ?string
+		{
+		return $this->discount;
+		}
+
+	public function setDiscount(?string $discount): self
+		{
+		$this->discount           = $discount;
+
+		return $this;
 		}
 
 	public function getDiscountPercentage(): float
 		{
-		return $this->discountPercentage;
+		return (float)$this->discount;
 		}
 
-	public function setDiscountPercentage(float $discountPercentage): self
+	/**
+	 * Returns the totalAmount for an item, with discount and quantity applied, without tax
+	 * @return float
+	 */
+	public function getItemTotal(): float
 		{
-		$this->discountPercentage = $discountPercentage;
+		return $this->itemTotal;
+		}
+
+	public function setItemTotal(float $itemTotal): self
+		{
+		$this->itemTotal = $itemTotal;
 
 		return $this;
 		}
@@ -75,14 +96,14 @@ class LineItem
 		return $this;
 		}
 
-	public function getPriceWithTax(): float
+	public function getPriceWithDiscountAndTax(): float
 		{
 		return $this->getRate() * $this->getDiscountMultiplier() * $this->getTaxMultiplier();
 		}
 
-	public function getValueWithTax(): float
+	public function getValueWithDiscountAndTax(): float
 		{
-		return $this->getRate() * $this->getDiscountMultiplier() * $this->getTaxMultiplier() * $this->getQuantity();
+		return $this->getItemTotal() * $this->getTaxMultiplier();
 		}
 
 	public function getPriceWithDiscount(): float
@@ -90,7 +111,15 @@ class LineItem
 		return $this->getRate() * $this->getDiscountMultiplier();
 		}
 
+	/**
+	 * Semantic getter alias
+	 */
 	public function getValueWithDiscount(): float
+		{
+		return $this->itemTotal;
+		}
+
+	public function getValueWithDiscount2(): float
 		{
 		return $this->getRate() * $this->getDiscountMultiplier() * $this->getQuantity();
 		}

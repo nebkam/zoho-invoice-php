@@ -112,13 +112,7 @@ abstract class Document
 	 */
 	public function getLineItemsWithDiscount(): array
 		{
-		$lineItems = [];
-		foreach ($this->lineItems as $item)
-			{
-			$lineItems[] = $item->setDiscountPercentage($this->getDiscountPercent());
-			}
-
-		return $lineItems;
+		return $this->lineItems;
 		}
 
 	/**

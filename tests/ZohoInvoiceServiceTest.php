@@ -292,27 +292,71 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @throws ZohoInvoiceException
 	 * @throws Exception
 	 */
-	public function testParseInvoiceFromWebhook(ZohoInvoiceService $service): void
+	public function testParseInvoiceWithDiscountFromWebhook(ZohoInvoiceService $service): void
 		{
-		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice.json');
+		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice-with-item-discounts.json');
 		$invoice = $service->parseInvoiceFromWebhook($json);
 		$this->assertNotNull($invoice);
-		$this->assertEquals('inv013604', $invoice->getInvoiceNumber());
-		$this->assertEquals('11978000003358020', $invoice->getInvoiceId());
-		$this->assertEquals('11978000001234119', $invoice->getCustomerId());
-		$this->assertEquals(15, $invoice->getDiscountPercent());
-		$this->assertEquals(25500, $invoice->getTotal());
-		$this->assertEquals('2020-12-21', $invoice->getDateAsDateTime()->format('Y-m-d'));
+		$this->assertEquals('inv019203', $invoice->getInvoiceNumber());
+		$this->assertEquals('11978000004920021', $invoice->getInvoiceId());
+		$this->assertEquals('11978000000028119', $invoice->getCustomerId());
+		$this->assertEquals(16.88895, $invoice->getDiscountPercent());
+		$this->assertEquals(124448.4, $invoice->getTotal());
+		$this->assertEquals('2022-02-14', $invoice->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertNotEmpty($invoice->getLineItems());
-		$lineItem = $invoice->getLineItemsWithDiscount()[0];
-		$this->assertEquals('11978000000177482', $lineItem->getItemId());
-		$this->assertEquals(25000, $lineItem->getRate());
-		$this->assertEquals(1, $lineItem->getQuantity());
-		$this->assertEquals(20, $lineItem->getTaxPercentage());
-		$this->assertEquals(21250.0, $lineItem->getPriceWithDiscount());
-		$this->assertEquals(25500.0, $lineItem->getPriceWithTax());
-		$this->assertEquals(21250.0, $lineItem->getValueWithDiscount()); /** Value is the same since the quantity is 1 */
-		$this->assertEquals(25500.0, $lineItem->getValueWithTax());  /** Value is the same since the quantity is 1 */
+		$lineItems = $invoice->getLineItems();
+		$this->assertCount(4, $lineItems);
+		$firstItem = $lineItems[0];
+		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals(15725, $firstItem->getRate());
+		$this->assertEquals(10, $firstItem->getDiscountPercentage());
+		$this->assertEquals(1, $firstItem->getQuantity());
+		$this->assertEquals(20, $firstItem->getTaxPercentage());
+		$this->assertEquals(14152.5, $firstItem->getItemTotal());
+		$firstItem = $lineItems[1];
+		$this->assertEquals('11978000000177482', $firstItem->getItemId());
+		$this->assertEquals(25000, $firstItem->getRate());
+		$this->assertEquals(15, $firstItem->getDiscountPercentage());
+		$this->assertEquals(1, $firstItem->getQuantity());
+		$this->assertEquals(20, $firstItem->getTaxPercentage());
+		$this->assertEquals(21250, $firstItem->getItemTotal());
+		$firstItem = $lineItems[2];
+		$this->assertEquals('11978000000177490', $firstItem->getItemId());
+		$this->assertEquals(50000, $firstItem->getRate());
+		$this->assertEquals(20, $firstItem->getDiscountPercentage());
+		$this->assertEquals(1, $firstItem->getQuantity());
+		$this->assertEquals(20, $firstItem->getTaxPercentage());
+		$this->assertEquals(40000, $firstItem->getItemTotal());
+		$firstItem = $lineItems[3];
+		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals(15725, $firstItem->getRate());
+		$this->assertEquals(10, $firstItem->getDiscountPercentage());
+		$this->assertEquals(2, $firstItem->getQuantity());
+		$this->assertEquals(20, $firstItem->getTaxPercentage());
+		$this->assertEquals(28305, $firstItem->getItemTotal());
+		$this->assertEquals($firstItem->getRate() * (100 - $firstItem->getDiscountPercentage())/100 * $firstItem->getQuantity(), $firstItem->getItemTotal());
+		}
 
+	/**
+	 * @group webhook-parse-invoice
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
+	public function testParseDiscountMultiplier(ZohoInvoiceService $service): void
+		{
+		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice-with-item-discounts.json');
+		$invoice = $service->parseInvoiceFromWebhook($json);
+		$this->assertNotNull($invoice);
+		$lineItems = $invoice->getLineItems();
+		$this->assertCount(4, $lineItems);
+		$firstItem = $lineItems[3];
+		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals(15725, $firstItem->getRate());
+		$this->assertEquals(10, $firstItem->getDiscountPercentage());
+		$this->assertEquals(14152.5, $firstItem->getPriceWithDiscount());
+		$this->assertEquals(16983, $firstItem->getPriceWithDiscountAndTax());
+		$this->assertEquals(28305, $firstItem->getValueWithDiscount());
+		$this->assertEquals(33966, $firstItem->getValueWithDiscountAndTax());
 		}
 	}
