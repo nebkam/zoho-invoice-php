@@ -5,14 +5,23 @@ namespace Nebkam\ZohoInvoice\Model;
 class LineItem
 	{
 	private string $itemId;
+	private string $name;
 	private float $rate;
 	private float $taxPercentage;
 	private float $quantity;
 	private ?string $discount;
 	private float $itemTotal;
 
-	public function __construct()
+	public function getName(): string
 		{
+		return $this->name;
+		}
+
+	public function setName(string $name): self
+		{
+		$this->name = $name;
+
+		return $this;
 		}
 
 	public function getDiscount(): ?string

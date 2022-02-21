@@ -309,6 +309,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$firstItem = $lineItems[0];
 		$this->assertEquals('11978000004734019', $firstItem->getItemId());
 		$this->assertEquals(15725, $firstItem->getRate());
+		$this->assertEquals('Ekskluziv+ 100', $firstItem->getName());
 		$this->assertEquals(10, $firstItem->getDiscountPercentage());
 		$this->assertEquals(1, $firstItem->getQuantity());
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
@@ -316,6 +317,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$firstItem = $lineItems[1];
 		$this->assertEquals('11978000000177482', $firstItem->getItemId());
 		$this->assertEquals(25000, $firstItem->getRate());
+		$this->assertEquals('Paket kredita 5000', $firstItem->getName());
 		$this->assertEquals(15, $firstItem->getDiscountPercentage());
 		$this->assertEquals(1, $firstItem->getQuantity());
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
@@ -323,6 +325,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$firstItem = $lineItems[2];
 		$this->assertEquals('11978000000177490', $firstItem->getItemId());
 		$this->assertEquals(50000, $firstItem->getRate());
+		$this->assertEquals('Paket kredita 10000', $firstItem->getName());
 		$this->assertEquals(20, $firstItem->getDiscountPercentage());
 		$this->assertEquals(1, $firstItem->getQuantity());
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
@@ -330,6 +333,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$firstItem = $lineItems[3];
 		$this->assertEquals('11978000004734019', $firstItem->getItemId());
 		$this->assertEquals(15725, $firstItem->getRate());
+		$this->assertEquals('Ekskluziv+ 100', $firstItem->getName());
 		$this->assertEquals(10, $firstItem->getDiscountPercentage());
 		$this->assertEquals(2, $firstItem->getQuantity());
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
