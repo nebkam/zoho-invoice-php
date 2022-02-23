@@ -9,6 +9,8 @@ class ContactPerson
 	private string $firstName;
 	private string $lastName;
 	private string $email;
+	private ?string $phone = null;
+	private ?string $mobile = null;
 
 	public function getContactId(): ?string
 		{
@@ -66,6 +68,30 @@ class ContactPerson
 	public function setEmail(string $email): self
 		{
 		$this->email = $email;
+
+		return $this;
+		}
+
+	public function getPhone(): ?string
+		{
+		return $this->phone;
+		}
+
+	public function setPhone(?string $phone): self
+		{
+		$this->phone = $phone;
+
+		return $this;
+		}
+
+	public function getMobile(): ?string
+		{
+		return $this->mobile;
+		}
+
+	public function setMobile(?string $mobile): self
+		{
+		$this->mobile = $mobile;
 
 		return $this;
 		}

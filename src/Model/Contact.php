@@ -10,6 +10,8 @@ class Contact
 	private ?string $contactId = null;
 	private string $contactName;
 	private string $companyName;
+	private ?string $email = null;
+	private ?string $phone= null;
 	private ?string $website = null;
 
 	public function getContactId(): ?string
@@ -56,6 +58,39 @@ class Contact
 	public function setWebsite(?string $website): self
 		{
 		$this->website = $website;
+
+		return $this;
+		}
+
+	public function getEmail(): ?string
+		{
+		return $this->email;
+		}
+
+	/**
+	 * Field is set indirectly via primary `ContactPerson`
+	 * It's only  exposed inside `Contact`
+	 */
+	public function setEmail(?string $email): self
+		{
+		$this->email = $email;
+
+		return $this;
+		}
+
+	public function getPhone(): ?string
+		{
+		return $this->phone;
+		}
+
+
+	/**
+	 * Field is set indirectly via primary `ContactPerson`
+	 * It's only  exposed inside `Contact`
+	 */
+	public function setPhone(?string $phone): self
+		{
+		$this->phone = $phone;
 
 		return $this;
 		}

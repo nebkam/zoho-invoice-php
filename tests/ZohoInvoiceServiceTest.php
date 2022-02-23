@@ -124,6 +124,69 @@ class ZohoInvoiceServiceTest extends TestCase
 	/**
 	 * @depends testCreateContact
 	 * @param array $params
+	 * @return array
+	 * @throws ZohoInvoiceException
+	 */
+	public function testActivateContact(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 */
+		[$service, $contact] = $params;
+		$contactId = $contact->getContactId();
+
+		$activation =  $service->activateContact($contactId);
+		$this->assertEquals(0, $activation->getCode());
+		$this->assertEquals('The contact has been marked as active.', $activation->getMessage());
+
+		return $params;
+		}
+
+	/**
+	 * @depends testActivateContact
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testDeactivateContact(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 */
+		[$service, $contact] = $params;
+		$contactId = $contact->getContactId();
+
+		$deactivate = $service->deactivateContact($contactId);
+		$this->assertEquals(0, $deactivate->getCode());
+		$this->assertEquals('The contact has been marked as inactive.', $deactivate->getMessage());
+		}
+
+	/**
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testUpdateContact(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contactPerson
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+		$contact->setCompanyName('Demo profil agencije3')
+			->setContactName('Demo profil agencije3')
+			->setWebsite('https://4z2.rs');
+		$contactUpdated =  $service->updateContact($contact);
+		$this->assertNotEmpty($contactUpdated->getContactId());
+		$this->assertEquals('https://4z2.rs', $contactUpdated->getWebsite());
+		$this->assertEquals('Demo profil agencije3', $contactUpdated->getCompanyName());
+		$this->assertEquals('Demo profil agencije3', $contactUpdated->getContactName());
+		}
+
+
+	/**
+	 * @depends testCreateContact
+	 * @param array $params
 	 * @throws ZohoInvoiceException
 	 */
 	public function testGetContact(array $params): void
@@ -156,13 +219,15 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setContactId($contact->getContactId())
 			->setFirstName('Demo profil agencije2')
 			->setLastName('Kontakt')
+			->setPhone('381691234567890')
 			->setEmail('demo.agencija.2@4z.rs');
 		$contactPerson = $service->createContactPerson($contactPerson);
 		$this->assertNotNull($contactPerson->getContactPersonId());
 
 		return [
 			$service,
-			$contactPerson
+			$contactPerson,
+			$contact
 		];
 		}
 
@@ -183,6 +248,49 @@ class ZohoInvoiceServiceTest extends TestCase
 			$contactPerson->getContactPersonId()
 		);
 		$this->assertEquals($contactPerson->getEmail(), $loadedContactPerson->getEmail());
+		}
+
+	/**
+	 * @depends testCreateContactPerson
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testPopulatedContact(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contactPerson
+		 * @var Contact $contact
+		 */
+		[$service, $contactPerson, $contact] = $params;
+		$contact = $service->getContact($contact->getContactId());
+		$this->assertNotEmpty($contact->getContactId());
+		$this->assertEquals($contactPerson->getEmail(), $contact->getEmail());
+		$this->assertEquals($contactPerson->getPhone(), $contact->getPhone());
+		$this->assertEquals('https://4z2.rs', $contact->getWebsite());
+		$this->assertEquals('Demo profil agencije3', $contact->getCompanyName());
+		$this->assertEquals('Demo profil agencije3', $contact->getContactName());
+		}
+
+	/**
+	 * @depends testCreateContactPerson
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testUpdateContactPerson(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contactPerson
+		 */
+		[$service, $contactPerson] = $params;
+		$contactPerson
+			->setPhone('381699876543210')
+			->setEmail('demo.agencija.3@4z.rs');
+		$contact = $service->updateContactPerson($contactPerson);
+		$this->assertNotEmpty($contact->getContactId());
+		$this->assertEquals('demo.agencija.3@4z.rs', $contact->getEmail());
+		$this->assertEquals('381699876543210', $contact->getPhone());
 		}
 
 	/**

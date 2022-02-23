@@ -32,8 +32,8 @@ class ZohoInvoiceService
 
 	public function __construct(
 		HttpClientInterface $client,
-		ValidatorInterface $validator,
-		ZohoOAuthService $authService)
+		ValidatorInterface  $validator,
+		ZohoOAuthService    $authService)
 		{
 		$this->serializer  = new ApiSerializer();
 		$this->client      = $client;
@@ -53,6 +53,42 @@ class ZohoInvoiceService
 
 		/** @var GetContactResponse $response */
 		return $response->getContact();
+		}
+
+	/**
+	 * @param Contact $contactPerson
+	 * @return Contact
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function updateContact(Contact $contactPerson): Contact
+		{
+		$response = $this->makePutRequest(sprintf('contacts/%s', $contactPerson->getContactId()), $contactPerson, GetContactResponse::class);
+
+		/** @var GetContactResponse $response */
+		return $response->getContact();
+		}
+
+	/**
+	 * @param string $contactId
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function deactivateContact(string $contactId): ApiResponse
+		{
+		return $this->makePostRequest(sprintf('contacts/%s/inactive', $contactId), null, ApiResponse::class);
+		}
+
+	/**
+	 * @param string $contactId
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function activateContact(string $contactId): ApiResponse
+		{
+		return $this->makePostRequest(sprintf('contacts/%s/active', $contactId), null, ApiResponse::class);
 		}
 
 	/**
@@ -89,6 +125,20 @@ class ZohoInvoiceService
 	public function createContactPerson(ContactPerson $contactPerson): ContactPerson
 		{
 		$response = $this->makePostRequest('contacts/contactpersons', $contactPerson, GetContactPersonResponse::class);
+
+		/** @var GetContactPersonResponse $response */
+		return $response->getContactPerson();
+		}
+
+	/**
+	 * @param ContactPerson $contactPerson
+	 * @return ContactPerson
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function updateContactPerson(ContactPerson $contactPerson): ContactPerson
+		{
+		$response = $this->makePutRequest(sprintf('contacts/contactpersons/%s', $contactPerson->getContactPersonId()), $contactPerson, GetContactPersonResponse::class);
 
 		/** @var GetContactPersonResponse $response */
 		return $response->getContactPerson();
@@ -158,7 +208,7 @@ class ZohoInvoiceService
 	public function parseEstimateFromWebhook(string $json): Estimate
 		{
 		/** @var CreateEstimateWebhook $webhook */
-		$webhook  = $this->serializer->deserialize($json, CreateEstimateWebhook::class);
+		$webhook = $this->serializer->deserialize($json, CreateEstimateWebhook::class);
 
 		return $this->validate($webhook->getEstimate());
 		}
@@ -181,19 +231,30 @@ class ZohoInvoiceService
 
 	/**
 	 * @param string $url
-	 * @param object $payload
+	 * @param object|null $payload
 	 * @param string $responseClass
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
 	 * @throws ZohoOAuthException
 	 */
-	private function makePostRequest(string $url, object $payload, string $responseClass): ApiResponse
+	private function makePostRequest(string $url, ?object $payload, string $responseClass): ApiResponse
 		{
-		return $this->makeRequest('POST', $url, [
-			'body' => [
-				'JSONString' => $this->serializer->serialize($payload)
-			]
-		], $responseClass);
+		$body = $payload ? $this->serializePayload($payload) : [];
+		return $this->makeRequest('POST', $url, $body, $responseClass);
+		}
+
+	/**
+	 * @param string $url
+	 * @param object|null $payload
+	 * @param string $responseClass
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	private function makePutRequest(string $url, ?object $payload, string $responseClass): ApiResponse
+		{
+		$body = $payload ? $this->serializePayload($payload) : [];
+		return $this->makeRequest('PUT', $url, $body, $responseClass);
 		}
 
 	/**
@@ -243,10 +304,19 @@ class ZohoInvoiceService
 
 			return $apiResponse;
 			}
-		catch (TransportExceptionInterface | ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface $exception)
+		catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $exception)
 			{
 			throw ZohoInvoiceException::fromHttpClientException($exception);
 			}
+		}
+
+	private function serializePayload(object $payload): array
+		{
+		return [
+			'body' => [
+				'JSONString' => $this->serializer->serialize($payload)
+			]
+		];
 		}
 
 	/**
