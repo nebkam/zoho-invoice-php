@@ -338,6 +338,17 @@ class ZohoInvoiceServiceTest extends TestCase
 	/**
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
+	 */
+	public function testGetEstimateById(ZohoInvoiceService $service): void
+		{
+		$estimate = $service->getEstimate('11978000000261355');
+
+		$this->assertEquals('est000012', $estimate->getEstimateNumber());
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
 	 * @throws Exception
 	 */
 	public function testParseEstimateFromWebhookNoLineItems(ZohoInvoiceService $service): void

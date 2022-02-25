@@ -10,6 +10,7 @@ use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
 use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\GetContactPersonResponse;
 use Nebkam\ZohoInvoice\Model\GetContactResponse;
+use Nebkam\ZohoInvoice\Model\GetEstimateResponse;
 use Nebkam\ZohoInvoice\Model\GetInvoiceResponse;
 use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
@@ -185,6 +186,20 @@ class ZohoInvoiceService
 
 		/** @var GetInvoiceResponse $response */
 		return $response->getInvoice();
+		}
+
+	/**
+	 * @param string $id
+	 * @return Estimate
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function getEstimate(string $id): Estimate
+		{
+		$response = $this->makeGetRequest('estimates/' . $id, GetEstimateResponse::class);
+
+		/** @var GetEstimateResponse $response */
+		return $response->getEstimate();
 		}
 
 	/**
