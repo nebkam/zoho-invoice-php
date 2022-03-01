@@ -243,6 +243,48 @@ class ZohoInvoiceServiceTest extends TestCase
 		return [$service, $estimate];
 		}
 
+
+	/**
+	 * @group estimate
+	 * @depends testCreateEstimate
+	 * @param array $params
+	 * @return array
+	 * @throws ZohoInvoiceException
+	 */
+	public function testUploadAttachmentToEstimate(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Estimate $estimate
+		 */
+		[$service, $estimate] = $params;
+		$response = $service->addAttachmentToEstimate($estimate->getEstimateId(), __DIR__ . '/files/inv000243-OT-09-1800112.pdf', 'est000196-PR-09-1800002.pdf');
+		$this->assertEquals('Your file has been attached.', $response->getMessage());
+		$this->assertGreaterThanOrEqual(1, $response->getCountAttachments());
+		$this->assertNotEmpty($response->getLastAttachment());
+
+		return [$service, $estimate];
+		}
+
+	/**
+	 * @group estimate
+	 * @depends testUploadAttachmentToEstimate
+	 * @param array $params
+	 * @return void
+	 * @throws ZohoInvoiceException
+	 */
+	public function testDeleteEstimateAttachment(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Estimate $estimate
+		 */
+		[$service, $estimate] = $params;
+
+		$response = $service->removeAttachmentFromEstimate($estimate->getEstimateId());
+		$this->assertEquals('Your file is no longer attached to the estimate.', $response->getMessage());
+		}
+
 	/**
 	 * @group estimate
 	 * @depends testCreateEstimate
@@ -511,7 +553,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @return void
 	 * @throws ZohoInvoiceException
 	 */
-	public function testDeleteAttachment(array $params): void
+	public function testDeleteInvoiceAttachment(array $params): void
 		{
 		/**
 		 * @var ZohoInvoiceService $service

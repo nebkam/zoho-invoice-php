@@ -256,13 +256,27 @@ class ZohoInvoiceService
 	 * @return void
 	 * @throws ZohoInvoiceException
 	 */
-	public function addAttachmentToEstimate(string $id, string $filePath, string $filename): ApiResponse
+	public function addAttachmentToEstimate(string $id, string $filePath, string $filename): AddAttachmentResponse
 		{
 		$formData = new FormDataPart([
-			'attachment'       => DataPart::fromPath($filePath, 'test')
+			'attachment' => DataPart::fromPath($filePath, $filename, 'application/pdf')
 		]);
 
-		return $this->makeMultipartRequest('POST', sprintf('estimates/%s/attachment', $id), [], ApiResponse::class,  $formData);
+		/**
+		 * @var AddAttachmentResponse $response
+		 * @noinspection PhpUnnecessaryLocalVariableInspection
+		 */
+		$response = $this->makeMultipartRequest('POST', sprintf('estimates/%s/attachment', $id), [], AddAttachmentResponse::class, $formData);
+
+		return $response;
+		}
+
+	/**
+	 * @throws ZohoInvoiceException
+	 */
+	public function removeAttachmentFromEstimate(string $id): ApiResponse
+		{
+		return $this->makeDeleteRequest(sprintf('estimates/%s/attachment', $id));
 		}
 
 	/**
