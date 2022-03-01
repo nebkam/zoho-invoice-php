@@ -89,6 +89,23 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group cleanup
+	 * @return array
+	 */
+	public function testInitArray(): array
+		{
+		$service = new ZohoInvoiceService(
+			new NativeHttpClient(),
+			self::createValidator(),
+			self::createAuth()
+		);
+		$this->assertNotNull($service);
+
+		return [$service, null, null];
+		}
+
+
+	/**
 	 * @depends testInit
 	 * @param ZohoInvoiceService $service
 	 * @return array
@@ -162,24 +179,50 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 
-		$invoice        = (new Invoice())
-			->setCustomerId($contact->getContactId())
-			->setDate((new DateTime())->format('Y-m-d'))
-			->setReferenceNumber('Test invoice from SDK')
-			->setTotal(16983)
-			->setLineItems([(new LineItem())
-				->setItemId(11978000004734019)
-				->setTaxPercentage(20)
-				->setRate(15725)
-				->setQuantity(1)
-				->setName('Ekskluziv+ 100')
-				->setItemTotal(14152.5)
-				->setDiscount('10%')]);
+		$invoice        = $this->getExampleInvoice($contact);
 		$invoiceCreated = $service->createInvoice($invoice);
 		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
 		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
 
 		return [$service, $invoiceCreated];
+		}
+
+	/**
+	 * @group create-invoice
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @return array
+	 */
+	public function testCreateEstimate(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+		$contact        = (new Contact())->setContactId(11978000000028119);
+		$invoicePayload = $this->getExampleInvoice($contact);
+		$estimate       = $service->createEstimate($invoicePayload);
+		$this->assertNotEmpty($estimate->getEstimateId());
+		$this->assertNotEmpty($estimate->getEstimateNumber());
+
+		return [$service, $estimate];
+		}
+
+	/**
+	 * @depends testCreateEstimate
+	 * @param array $params
+	 * @return void
+	 */
+	public function testDeleteEstimate(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Estimate $estimate
+		 */
+		[$service, $estimate] = $params;
+		$result = $service->deleteEstimate($estimate);
+		$this->assertTrue($result->isSuccessful());
 		}
 
 	/**
@@ -619,5 +662,39 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(16983, $firstItem->getPriceWithDiscountAndTax());
 		$this->assertEquals(28305, $firstItem->getValueWithDiscount());
 		$this->assertEquals(33966, $firstItem->getValueWithDiscountAndTax());
+		}
+
+	private function getExampleInvoice(Contact $contact): Invoice
+		{
+		return (new Invoice())
+			->setCustomerId($contact->getContactId())
+			->setDate((new DateTime())->format('Y-m-d'))
+			->setReferenceNumber('Test invoice from SDK')
+			->setTotal(16983)
+			->setLineItems([(new LineItem())
+				->setItemId(11978000004734019)
+				->setTaxPercentage(20)
+				->setRate(15725)
+				->setQuantity(1)
+				->setName('Ekskluziv+ 100')
+				->setItemTotal(14152.5)
+				->setDiscount('10%')]);
+		}
+
+	private function getExampleEstimate(Contact $contact): Estimate
+		{
+		return (new Estimate())
+			->setCustomerId($contact->getContactId())
+			->setDate((new DateTime())->format('Y-m-d'))
+			->setReferenceNumber('Test estimate from SDK')
+			->setTotal(16983)
+			->setLineItems([(new LineItem())
+				->setItemId(11978000004734019)
+				->setTaxPercentage(20)
+				->setRate(15725)
+				->setQuantity(1)
+				->setName('Ekskluziv+ 100')
+				->setItemTotal(14152.5)
+				->setDiscount('10%')]);
 		}
 	}

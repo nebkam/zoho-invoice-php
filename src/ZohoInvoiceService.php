@@ -188,9 +188,21 @@ class ZohoInvoiceService
 
 	public function deleteInvoice(Invoice $invoice): ?ApiResponse
 		{
-//		dump($invoice->getInvoiceId());
-//		return null;
 		return $this->makeDeleteRequest(sprintf('invoices/%s', $invoice->getInvoiceId()));
+		}
+
+	public function createEstimate(Invoice $invoice): Estimate
+		{
+		$response = $this->makePostRequest('estimates', $invoice,GetEstimateResponse::class, ContextGroup::CONTEXT_CREATE);
+
+		/** @var GetEstimateResponse $response */
+		return $response->getEstimate();
+		}
+
+
+	public function deleteEstimate(Estimate $invoice): ?ApiResponse
+		{
+		return $this->makeDeleteRequest(sprintf('estimates/%s', $invoice->getEstimateId()));
 		}
 
 	/**
