@@ -191,9 +191,17 @@ class ZohoInvoiceService
 		return $this->makeDeleteRequest(sprintf('invoices/%s', $invoice->getInvoiceId()));
 		}
 
-	public function createEstimate(Invoice $invoice): Estimate
+	public function createEstimate(Estimate $invoice): Estimate
 		{
 		$response = $this->makePostRequest('estimates', $invoice,GetEstimateResponse::class, ContextGroup::CONTEXT_CREATE);
+
+		/** @var GetEstimateResponse $response */
+		return $response->getEstimate();
+		}
+
+	public function updateEstimate(Estimate $invoice): Estimate
+		{
+		$response = $this->makePutRequest(sprintf('estimates/%s', $invoice->getEstimateId()), $invoice,GetEstimateResponse::class, ContextGroup::CONTEXT_CREATE);
 
 		/** @var GetEstimateResponse $response */
 		return $response->getEstimate();
@@ -352,13 +360,13 @@ class ZohoInvoiceService
 	 * @param string $url
 	 * @param object|null $payload
 	 * @param string $responseClass
+	 * @param string|null $context
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
-	 * @throws ZohoOAuthException
 	 */
-	private function makePutRequest(string $url, ?object $payload, string $responseClass): ApiResponse
+	private function makePutRequest(string $url, ?object $payload, string $responseClass, ?string $context = null): ApiResponse
 		{
-		$body = $payload ? $this->serializePayload($payload) : [];
+		$body = $payload ? $this->serializePayload($payload, $context) : [];
 
 		return $this->makeRequest('PUT', $url, $body, $responseClass);
 		}

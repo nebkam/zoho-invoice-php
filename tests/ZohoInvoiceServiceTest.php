@@ -131,6 +131,7 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setWebsite('https://4z.rs');
 		$this->expectException(ZohoInvoiceException::class);
 		$service->createContact($data);
+		$service->createContact($data);
 		}
 
 	/**
@@ -192,10 +193,31 @@ class ZohoInvoiceServiceTest extends TestCase
 		 * @var Contact $contact
 		 */
 		[$service, $contact] = $params;
-		$invoicePayload = $this->getExampleInvoice($contact);
-		$estimate       = $service->createEstimate($invoicePayload);
+		$estimatePayload = $this->getExampleEstimate($contact);
+		$estimate       = $service->createEstimate($estimatePayload);
 		$this->assertNotEmpty($estimate->getEstimateId());
 		$this->assertNotEmpty($estimate->getEstimateNumber());
+
+		return [$service, $estimate];
+		}
+
+	/**
+	 * @group estimate
+	 * @depends testCreateEstimate
+	 * @param array $params
+	 * @return array
+	 */
+	public function testUpdateEstimate(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Estimate $estimatePayload
+		 */
+		[$service, $estimatePayload] = $params;
+		$estimatePayload->setReferenceNumber('new reference number');
+		$estimate       = $service->updateEstimate($estimatePayload);
+		$this->assertNotEmpty($estimate->getEstimateId());
+		$this->assertEquals('new reference number', $estimate->getReferenceNumber());
 
 		return [$service, $estimate];
 		}
