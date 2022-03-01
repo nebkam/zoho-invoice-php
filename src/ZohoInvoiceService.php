@@ -186,6 +186,14 @@ class ZohoInvoiceService
 		return $response->getInvoice();
 		}
 
+	public function updateInvoice(Invoice $invoice): Invoice
+		{
+		$response = $this->makePutRequest(sprintf('invoices/%s', $invoice->getInvoiceId()), $invoice,GetInvoiceResponse::class, ContextGroup::CONTEXT_CREATE);
+
+		/** @var GetInvoiceResponse $response */
+		return $response->getInvoice();
+		}
+
 	public function deleteInvoice(Invoice $invoice): ?ApiResponse
 		{
 		return $this->makeDeleteRequest(sprintf('invoices/%s', $invoice->getInvoiceId()));

@@ -181,6 +181,27 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group invoice
+	 * @depends testCreateInvoice
+	 * @param array $params
+	 * @return array
+	 */
+	public function testUpdateInvoice(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoicePayload
+		 */
+		[$service, $invoicePayload] = $params;
+		$invoicePayload->setReferenceNumber('new invoice reference number');
+		$invoice       = $service->updateInvoice($invoicePayload);
+		$this->assertNotEmpty($invoice->getInvoiceId());
+		$this->assertEquals('new invoice reference number', $invoice->getReferenceNumber());
+
+		return [$service, $invoice];
+		}
+
+	/**
 	 * @group estimate
 	 * @depends testCreateContact
 	 * @param array $params
