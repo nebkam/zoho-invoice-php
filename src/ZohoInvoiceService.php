@@ -178,6 +178,14 @@ class ZohoInvoiceService
 		return $this->makeDeleteRequest('contacts/contactpersons/' . $id);
 		}
 
+	public function createInvoice(Invoice $invoice): Invoice
+		{
+		$response = $this->makePostRequest('invoices', $invoice,GetInvoiceResponse::class, ContextGroup::CONTEXT_CREATE);
+
+		/** @var GetInvoiceResponse $response */
+		return $response->getInvoice();
+		}
+
 	/**
 	 * @param string $id
 	 * @return Invoice
@@ -310,13 +318,13 @@ class ZohoInvoiceService
 	 * @param string $url
 	 * @param object|null $payload
 	 * @param string $responseClass
+	 * @param string|null $context
 	 * @return ApiResponse
 	 * @throws ZohoInvoiceException
-	 * @throws ZohoOAuthException
 	 */
-	private function makePostRequest(string $url, ?object $payload, string $responseClass): ApiResponse
+	private function makePostRequest(string $url, ?object $payload, string $responseClass, ?string $context = null): ApiResponse
 		{
-		$body = $payload ? $this->serializePayload($payload) : [];
+		$body = $payload ? $this->serializePayload($payload, $context) : [];
 
 		return $this->makeRequest('POST', $url, $body, $responseClass);
 		}
@@ -426,11 +434,11 @@ class ZohoInvoiceService
 			}
 		}
 
-	private function serializePayload(object $payload): array
+	private function serializePayload(object $payload, ?string $context = null): array
 		{
 		return [
 			'body' => [
-				'JSONString' => $this->serializer->serialize($payload)
+				'JSONString' => $this->serializer->serialize($payload, $context)
 			]
 		];
 		}

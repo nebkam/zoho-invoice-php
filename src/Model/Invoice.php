@@ -2,7 +2,9 @@
 
 namespace Nebkam\ZohoInvoice\Model;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Nebkam\ZohoInvoice\ContextGroup;
 
 class Invoice extends Document
 	{
@@ -18,6 +20,9 @@ class Invoice extends Document
 	 */
 	private ?string $invoiceId;
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getInvoiceNumber(): ?string
 		{
 		return $this->invoiceNumber;
@@ -30,6 +35,9 @@ class Invoice extends Document
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getInvoiceId(): ?string
 		{
 		return $this->invoiceId;
@@ -45,18 +53,9 @@ class Invoice extends Document
 
 	public static function fromEstimate(Estimate $estimate): self
 		{
-		$invoice           = (new self());
-		$filteredLineItems = [];
-		foreach ($estimate->getLineItems() as $lineItem)
-			{
-			$lineItem->setItemId(null);
-			$filteredLineItems[] = $lineItem;
-			}
-		$invoice
-			->setLineItems($filteredLineItems)
+		return (new self())
+			->setLineItems($estimate->getLineItems())
 //			->setDiscountPercent($estimate->getDiscountPercent())
 			->setCustomerId($estimate->getCustomerId());
-
-		return $invoice;
 		}
 	}

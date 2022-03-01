@@ -5,7 +5,9 @@ namespace Nebkam\ZohoInvoice\Model;
 use DateTime;
 use Exception;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Nebkam\ZohoInvoice\ContextGroup;
 
 abstract class Document
 	{
@@ -41,6 +43,10 @@ abstract class Document
 	 */
 	private ?string $referenceNumber;
 
+
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getCustomerId(): ?string
 		{
 		return $this->customerId;
@@ -53,6 +59,9 @@ abstract class Document
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getDiscountPercent(): ?float
 		{
 		return $this->discountPercent;
@@ -65,6 +74,9 @@ abstract class Document
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getTotal(): ?float
 		{
 		return $this->total;
@@ -77,6 +89,9 @@ abstract class Document
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getDate(): ?string
 		{
 		return $this->date;
@@ -105,6 +120,7 @@ abstract class Document
 		}
 
 	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
 	 * @return LineItem[]
 	 */
 	public function getLineItems(): array
@@ -131,6 +147,9 @@ abstract class Document
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getReferenceNumber(): ?string
 		{
 		return $this->referenceNumber;

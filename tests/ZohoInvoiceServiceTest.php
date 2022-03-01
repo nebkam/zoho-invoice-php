@@ -6,6 +6,7 @@ use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\Invoice;
+use Nebkam\ZohoInvoice\Model\LineItem;
 use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Nebkam\ZohoInvoice\ZohoInvoiceService;
@@ -72,7 +73,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group demo
+	 * @group create-invoice
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -330,6 +331,34 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group create-invoice
+	 * @depends testInit
+	 * @param ZohoInvoiceService $service
+	 * @return array
+	 */
+	public function testCreateInvoice(ZohoInvoiceService $service): array
+		{
+		self::markTestSkipped('Skip until unhardcode customr id and implement cleanup');
+		$invoice        = (new Invoice())
+			->setCustomerId(11978000000028119) /** Demo agency **/
+			->setDate((new DateTime())->format('Y-m-d'))
+			->setReferenceNumber('Test invoice from SDK')
+			->setTotal(16983)
+			->setLineItems([(new LineItem())
+				->setItemId(11978000004734019)
+				->setTaxPercentage(20)
+				->setRate(15725)
+				->setQuantity(1)
+				->setName('Ekskluziv+ 100')
+				->setItemTotal(14152.5)
+				->setDiscount('10%')]);
+		$invoiceCreated = $service->createInvoice($invoice);
+		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
+		dump($invoiceCreated);
+		return [$service, null];
+		}
+
+	/**
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
 	 */
@@ -423,9 +452,8 @@ class ZohoInvoiceServiceTest extends TestCase
 		$invoice = Invoice::fromEstimate($estimate);
 		$this->assertEmpty($invoice->getInvoiceNumber());
 		$estimateLineItem = $estimate->getLineItems()[0];
-		$invoiceLineItem = $invoice->getLineItems()[0];
+		$invoiceLineItem  = $invoice->getLineItems()[0];
 
-		$this->assertNull($invoiceLineItem->getItemId());
 		$this->assertEquals($estimateLineItem->getName(), $invoiceLineItem->getName());
 		$this->assertEquals($estimateLineItem->getRate(), $invoiceLineItem->getRate());
 		$this->assertEquals($estimateLineItem->getTaxPercentage(), $invoiceLineItem->getTaxPercentage());

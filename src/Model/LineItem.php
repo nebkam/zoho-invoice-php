@@ -2,9 +2,12 @@
 
 namespace Nebkam\ZohoInvoice\Model;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+use Nebkam\ZohoInvoice\ContextGroup;
+
 class LineItem
 	{
-	private ?string $itemId;
+	private string $itemId;
 	private string $name;
 	private float $rate;
 	private float $taxPercentage;
@@ -12,6 +15,9 @@ class LineItem
 	private ?string $discount;
 	private float $itemTotal;
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getName(): string
 		{
 		return $this->name;
@@ -24,6 +30,9 @@ class LineItem
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getDiscount(): ?string
 		{
 		return $this->discount;
@@ -31,11 +40,14 @@ class LineItem
 
 	public function setDiscount(?string $discount): self
 		{
-		$this->discount           = $discount;
+		$this->discount = $discount;
 
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getDiscountPercentage(): float
 		{
 		return (float)$this->discount;
@@ -43,6 +55,7 @@ class LineItem
 
 	/**
 	 * Returns the totalAmount for an item, with discount and quantity applied, without tax
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
 	 * @return float
 	 */
 	public function getItemTotal(): float
@@ -57,18 +70,24 @@ class LineItem
 		return $this;
 		}
 
-	public function getItemId(): ?string
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
+	public function getItemId(): string
 		{
 		return $this->itemId;
 		}
 
-	public function setItemId(?string $itemId): self
+	public function setItemId(string $itemId): self
 		{
 		$this->itemId = $itemId;
 
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getRate(): float
 		{
 		return $this->rate;
@@ -81,6 +100,9 @@ class LineItem
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getTaxPercentage(): float
 		{
 		return $this->taxPercentage;
@@ -93,6 +115,9 @@ class LineItem
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_CREATE})
+	 */
 	public function getQuantity(): float
 		{
 		return $this->quantity;

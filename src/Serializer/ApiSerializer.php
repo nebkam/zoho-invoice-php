@@ -43,14 +43,15 @@ class ApiSerializer
 
 	/**
 	 * @param object $object
+	 * @param string|null $context
 	 * @return string
 	 * @throws ZohoInvoiceException
 	 */
-	public function serialize(object $object): string
+	public function serialize(object $object, ?string $context = null): string
 		{
 		try
 			{
-			return $this->serializer->serialize($object, 'json');
+			return $this->serializer->serialize($object, 'json',  ['groups' => $context]);
 			}
 		catch (ExceptionInterface $exception)
 			{
