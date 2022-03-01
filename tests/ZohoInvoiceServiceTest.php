@@ -4,6 +4,8 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Nebkam\ZohoInvoice\Model\Attachment;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
+use Nebkam\ZohoInvoice\Model\Estimate;
+use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Nebkam\ZohoInvoice\ZohoInvoiceService;
@@ -138,7 +140,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		[$service, $contact] = $params;
 		$contactId = $contact->getContactId();
 
-		$activation =  $service->activateContact($contactId);
+		$activation = $service->activateContact($contactId);
 		$this->assertEquals(0, $activation->getCode());
 		$this->assertEquals('The contact has been marked as active.', $activation->getMessage());
 
@@ -179,7 +181,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$contact->setCompanyName('Demo profil agencije3')
 			->setContactName('Demo profil agencije3')
 			->setWebsite('https://4z2.rs');
-		$contactUpdated =  $service->updateContact($contact);
+		$contactUpdated = $service->updateContact($contact);
 		$this->assertNotEmpty($contactUpdated->getContactId());
 		$this->assertEquals('https://4z2.rs', $contactUpdated->getWebsite());
 		$this->assertEquals('Demo profil agencije3', $contactUpdated->getCompanyName());
@@ -346,7 +348,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testUploadAttachmentToInvoice(ZohoInvoiceService $service): array
 		{
-		$response = $service->addAttachmentToInvoice(self::DEMO_INVOICE_ID, __DIR__.'/files/inv000243-OT-09-1800112.pdf', 'inv000196-OT-09-1800002-S.pdf');
+		$response = $service->addAttachmentToInvoice(self::DEMO_INVOICE_ID, __DIR__ . '/files/inv000243-OT-09-1800112.pdf', 'inv000196-OT-09-1800002-S.pdf');
 		$this->assertEquals('Your file has been attached.', $response->getMessage());
 		$this->assertGreaterThanOrEqual(1, $response->getCountAttachments());
 		$this->assertNotEmpty($response->getLastAttachment());
@@ -365,7 +367,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		{
 		/**
 		 * @var ZohoInvoiceService $service
-		 * @var string $documentId
+		 * @var string $invoiceId
 		 */
 		[$service, $invoiceId] = $params;
 
@@ -379,7 +381,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testParseAttachment(ZohoInvoiceService $service): void
 		{
-		$test = '{"code":0,"message":"Your file has been attached.","documents":[{"document_id":"11978000004982698","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982706","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983403","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983411","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982714","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982722","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983419","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"}]}';
+		$test     = '{"code":0,"message":"Your file has been attached.","documents":[{"document_id":"11978000004982698","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982706","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983403","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983411","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982714","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982722","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983419","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"}]}';
 		$response = $service->parseAttachment($test);
 		$this->assertNotNull($response->getDocuments());
 		foreach ($response->getDocuments() as $attachment)
@@ -396,11 +398,39 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
 	 */
-	public function testGetEstimateById(ZohoInvoiceService $service): void
+	public function testGetEstimateById(ZohoInvoiceService $service): array
 		{
 		$estimate = $service->getEstimate('11978000000261355');
 
 		$this->assertEquals('est000012', $estimate->getEstimateNumber());
+
+		return [$service, $estimate];
+		}
+
+	/**
+	 * @depends testGetEstimateById
+	 * @param array $params
+	 * @return void
+	 */
+	public function testFromEstimate(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Estimate $estimate
+		 */
+		[$service, $estimate] = $params;
+		$invoice = Invoice::fromEstimate($estimate);
+		$this->assertEmpty($invoice->getInvoiceNumber());
+		$estimateLineItem = $estimate->getLineItems()[0];
+		$invoiceLineItem = $invoice->getLineItems()[0];
+
+		$this->assertNull($invoiceLineItem->getItemId());
+		$this->assertEquals($estimateLineItem->getName(), $invoiceLineItem->getName());
+		$this->assertEquals($estimateLineItem->getRate(), $invoiceLineItem->getRate());
+		$this->assertEquals($estimateLineItem->getTaxPercentage(), $invoiceLineItem->getTaxPercentage());
+		$this->assertEquals($estimateLineItem->getQuantity(), $invoiceLineItem->getQuantity());
+		$this->assertEquals($estimateLineItem->getDiscount(), $invoiceLineItem->getDiscount());
+		$this->assertEquals($estimateLineItem->getItemTotal(), $invoiceLineItem->getItemTotal());
 		}
 
 	/**
@@ -514,7 +544,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(2, $firstItem->getQuantity());
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
 		$this->assertEquals(28305, $firstItem->getItemTotal());
-		$this->assertEquals($firstItem->getRate() * (100 - $firstItem->getDiscountPercentage())/100 * $firstItem->getQuantity(), $firstItem->getItemTotal());
+		$this->assertEquals($firstItem->getRate() * (100 - $firstItem->getDiscountPercentage()) / 100 * $firstItem->getQuantity(), $firstItem->getItemTotal());
 		}
 
 	/**

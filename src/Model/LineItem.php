@@ -4,7 +4,7 @@ namespace Nebkam\ZohoInvoice\Model;
 
 class LineItem
 	{
-	private string $itemId;
+	private ?string $itemId;
 	private string $name;
 	private float $rate;
 	private float $taxPercentage;
@@ -57,12 +57,12 @@ class LineItem
 		return $this;
 		}
 
-	public function getItemId(): string
+	public function getItemId(): ?string
 		{
 		return $this->itemId;
 		}
 
-	public function setItemId(string $itemId): self
+	public function setItemId(?string $itemId): self
 		{
 		$this->itemId = $itemId;
 

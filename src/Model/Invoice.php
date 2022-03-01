@@ -10,7 +10,7 @@ class Invoice extends Document
 	 * @Assert\NotBlank()
 	 * @var string|null
 	 */
-	private ?string $invoiceNumber;
+	private ?string $invoiceNumber = null;
 
 	/**
 	 * @Assert\NotBlank()
@@ -41,5 +41,22 @@ class Invoice extends Document
 		$this->invoiceId = $invoiceId;
 
 		return $this;
+		}
+
+	public static function fromEstimate(Estimate $estimate): self
+		{
+		$invoice           = (new self());
+		$filteredLineItems = [];
+		foreach ($estimate->getLineItems() as $lineItem)
+			{
+			$lineItem->setItemId(null);
+			$filteredLineItems[] = $lineItem;
+			}
+		$invoice
+			->setLineItems($filteredLineItems)
+//			->setDiscountPercent($estimate->getDiscountPercent())
+			->setCustomerId($estimate->getCustomerId());
+
+		return $invoice;
 		}
 	}
