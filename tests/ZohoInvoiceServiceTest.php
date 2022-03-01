@@ -159,49 +159,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group invoice
-	 * @depends testCreateContact
-	 * @param array $params
-	 * @return array
-	 */
-	public function testCreateInvoice(array $params): array
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 * @var Contact $contact
-		 */
-		[$service, $contact] = $params;
-
-		$invoice        = $this->getExampleInvoice($contact);
-		$invoiceCreated = $service->createInvoice($invoice);
-		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
-		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
-
-		return [$service, $invoiceCreated];
-		}
-
-	/**
-	 * @group invoice
-	 * @depends testCreateInvoice
-	 * @param array $params
-	 * @return array
-	 */
-	public function testUpdateInvoice(array $params): array
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 * @var Invoice $invoicePayload
-		 */
-		[$service, $invoicePayload] = $params;
-		$invoicePayload->setReferenceNumber('new invoice reference number');
-		$invoice       = $service->updateInvoice($invoicePayload);
-		$this->assertNotEmpty($invoice->getInvoiceId());
-		$this->assertEquals('new invoice reference number', $invoice->getReferenceNumber());
-
-		return [$service, $invoice];
-		}
-
-	/**
 	 * @group estimate
 	 * @depends testCreateContact
 	 * @param array $params
@@ -215,7 +172,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 		$estimatePayload = $this->getExampleEstimate($contact);
-		$estimate       = $service->createEstimate($estimatePayload);
+		$estimate        = $service->createEstimate($estimatePayload);
 		$this->assertNotEmpty($estimate->getEstimateId());
 		$this->assertNotEmpty($estimate->getEstimateNumber());
 
@@ -236,13 +193,12 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $estimatePayload] = $params;
 		$estimatePayload->setReferenceNumber('new reference number');
-		$estimate       = $service->updateEstimate($estimatePayload);
+		$estimate = $service->updateEstimate($estimatePayload);
 		$this->assertNotEmpty($estimate->getEstimateId());
 		$this->assertEquals('new reference number', $estimate->getReferenceNumber());
 
 		return [$service, $estimate];
 		}
-
 
 	/**
 	 * @group estimate
@@ -300,6 +256,88 @@ class ZohoInvoiceServiceTest extends TestCase
 		[$service, $estimate] = $params;
 		$result = $service->deleteEstimate($estimate);
 		$this->assertTrue($result->isSuccessful());
+		}
+
+	/**
+	 * @group invoice
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @return array
+	 */
+	public function testCreateInvoice(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+		$invoice        = $this->getExampleInvoice($contact);
+		$invoiceCreated = $service->createInvoice($invoice);
+		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
+		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
+
+		return [$service, $invoiceCreated];
+		}
+
+	/**
+	 * @group invoice
+	 * @depends testCreateInvoice
+	 * @param array $params
+	 * @return array
+	 */
+	public function testUpdateInvoice(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoicePayload
+		 */
+		[$service, $invoicePayload] = $params;
+		$invoicePayload->setReferenceNumber('new invoice reference number');
+		$invoice = $service->updateInvoice($invoicePayload);
+		$this->assertNotEmpty($invoice->getInvoiceId());
+		$this->assertEquals('new invoice reference number', $invoice->getReferenceNumber());
+
+		return [$service, $invoice];
+		}
+
+	/**
+	 * @group invoice
+	 * @depends testCreateInvoice
+	 * @param array $params
+	 * @return array
+	 * @throws ZohoInvoiceException
+	 */
+	public function testUploadAttachmentToInvoice(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoice
+		 */
+		[$service, $invoice] = $params;
+		$response = $service->addAttachmentToInvoice($invoice->getInvoiceId(), __DIR__ . '/files/inv000243-OT-09-1800112.pdf', 'inv000196-OT-09-1800002-S.pdf');
+		$this->assertEquals('Your file has been attached.', $response->getMessage());
+		$this->assertGreaterThanOrEqual(1, $response->getCountAttachments());
+		$this->assertNotEmpty($response->getLastAttachment());
+
+		return [$service, $invoice];
+		}
+
+	/**
+	 * @group invoice
+	 * @depends testUploadAttachmentToInvoice
+	 * @param array $params
+	 * @return void
+	 * @throws ZohoInvoiceException
+	 */
+	public function testDeleteInvoiceAttachment(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoice
+		 */
+		[$service, $invoice] = $params;
+		$response = $service->removeAttachmentFromInvoice($invoice->getInvoiceId());
+		$this->assertEquals('Your file is no longer attached to the invoice.', $response->getMessage());
 		}
 
 	/**
@@ -527,42 +565,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		{
 		$invoice = $service->getInvoice('11978000000311915');
 		$this->assertEquals('inv000999', $invoice->getInvoiceNumber());
-		}
-
-	/**
-	 * @group demo
-	 * @depends testInit
-	 * @param ZohoInvoiceService $service
-	 * @return array
-	 * @throws ZohoInvoiceException
-	 */
-	public function testUploadAttachmentToInvoice(ZohoInvoiceService $service): array
-		{
-		$response = $service->addAttachmentToInvoice(self::DEMO_INVOICE_ID, __DIR__ . '/files/inv000243-OT-09-1800112.pdf', 'inv000196-OT-09-1800002-S.pdf');
-		$this->assertEquals('Your file has been attached.', $response->getMessage());
-		$this->assertGreaterThanOrEqual(1, $response->getCountAttachments());
-		$this->assertNotEmpty($response->getLastAttachment());
-
-		return [$service, self::DEMO_INVOICE_ID];
-		}
-
-	/**
-	 * @group demo
-	 * @depends testUploadAttachmentToInvoice
-	 * @param array $params
-	 * @return void
-	 * @throws ZohoInvoiceException
-	 */
-	public function testDeleteInvoiceAttachment(array $params): void
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 * @var string $invoiceId
-		 */
-		[$service, $invoiceId] = $params;
-
-		$response = $service->removeAttachmentFromInvoice($invoiceId);
-		$this->assertEquals('Your file is no longer attached to the invoice.', $response->getMessage());
 		}
 
 	/**
