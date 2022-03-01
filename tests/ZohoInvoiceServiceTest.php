@@ -403,6 +403,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$estimate = $service->getEstimate('11978000000261355');
 
 		$this->assertEquals('est000012', $estimate->getEstimateNumber());
+		$this->assertEquals('18PR00007', $estimate->getReferenceNumber());
 
 		return [$service, $estimate];
 		}

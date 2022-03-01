@@ -36,6 +36,11 @@ abstract class Document
 	 */
 	private array $lineItems;
 
+	/**
+	 * ReferenceNumber should e linked to the invoiceId inside erp
+	 */
+	private ?string $referenceNumber;
+
 	public function getCustomerId(): ?string
 		{
 		return $this->customerId;
@@ -122,6 +127,18 @@ abstract class Document
 	public function setLineItems(array $lineItems): self
 		{
 		$this->lineItems = $lineItems;
+
+		return $this;
+		}
+
+	public function getReferenceNumber(): ?string
+		{
+		return $this->referenceNumber;
+		}
+
+	public function setReferenceNumber(?string $referenceNumber): self
+		{
+		$this->referenceNumber = $referenceNumber;
 
 		return $this;
 		}
