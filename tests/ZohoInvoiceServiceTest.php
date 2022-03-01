@@ -200,7 +200,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		 * @var Contact $contact
 		 */
 		[$service, $contact] = $params;
-		$contact        = (new Contact())->setContactId(11978000000028119);
 		$invoicePayload = $this->getExampleInvoice($contact);
 		$estimate       = $service->createEstimate($invoicePayload);
 		$this->assertNotEmpty($estimate->getEstimateId());
