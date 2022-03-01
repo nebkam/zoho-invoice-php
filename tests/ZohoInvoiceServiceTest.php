@@ -1,6 +1,7 @@
 <?php
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Nebkam\ZohoInvoice\Model\Attachment;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
@@ -23,6 +24,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ZohoInvoiceServiceTest extends TestCase
 	{
+	private const DEMO_INVOICE_ID = '11978000004952006';
+
 	private static function createSerializer(): SerializerInterface
 		{
 		$classMetadataFactory   = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -67,7 +70,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group webhook-parse-invoice
+	 * @group demo
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -182,7 +185,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals('Demo profil agencije3', $contactUpdated->getCompanyName());
 		$this->assertEquals('Demo profil agencije3', $contactUpdated->getContactName());
 		}
-
 
 	/**
 	 * @depends testCreateContact
@@ -333,6 +335,61 @@ class ZohoInvoiceServiceTest extends TestCase
 		{
 		$invoice = $service->getInvoice('11978000000311915');
 		$this->assertEquals('inv000999', $invoice->getInvoiceNumber());
+		}
+
+	/**
+	 * @group demo
+	 * @depends testInit
+	 * @param ZohoInvoiceService $service
+	 * @return array
+	 * @throws ZohoInvoiceException
+	 */
+	public function testUploadAttachmentToInvoice(ZohoInvoiceService $service): array
+		{
+		$response = $service->addAttachmentToInvoice(self::DEMO_INVOICE_ID, __DIR__.'/files/inv000243-OT-09-1800112.pdf', 'inv000196-OT-09-1800002-S.pdf');
+		$this->assertEquals('Your file has been attached.', $response->getMessage());
+		$this->assertGreaterThanOrEqual(1, $response->getCountAttachments());
+		$this->assertNotEmpty($response->getLastAttachment());
+
+		return [$service, self::DEMO_INVOICE_ID];
+		}
+
+	/**
+	 * @group demo
+	 * @depends testUploadAttachmentToInvoice
+	 * @param array $params
+	 * @return void
+	 * @throws ZohoInvoiceException
+	 */
+	public function testDeleteAttachment(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var string $documentId
+		 */
+		[$service, $invoiceId] = $params;
+
+		$response = $service->removeAttachmentFromInvoice($invoiceId);
+		$this->assertEquals('Your file is no longer attached to the invoice.', $response->getMessage());
+		}
+
+	/**
+	 * @depends testInit
+	 * @throws ZohoInvoiceException
+	 */
+	public function testParseAttachment(ZohoInvoiceService $service): void
+		{
+		$test = '{"code":0,"message":"Your file has been attached.","documents":[{"document_id":"11978000004982698","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982706","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983403","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983411","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982714","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004982722","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"},{"document_id":"11978000004983419","file_name":"inv000196-OT-09-1800002-S.pdf","file_type":"pdf","file_size":87585,"file_size_formatted":"85.5 KB"}]}';
+		$response = $service->parseAttachment($test);
+		$this->assertNotNull($response->getDocuments());
+		foreach ($response->getDocuments() as $attachment)
+			{
+			$this->assertInstanceOf(Attachment::class, $attachment);
+			}
+		$this->assertNotEmpty($response->getLastAttachment());
+		$this->assertInstanceOf(Attachment::class, $response->getLastAttachment());
+		$this->assertEquals("inv000196-OT-09-1800002-S.pdf", $response->getLastAttachment()->getFileName());
+		$this->assertEquals("pdf", $response->getLastAttachment()->getFileType());
 		}
 
 	/**

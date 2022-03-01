@@ -7,6 +7,10 @@
     {
       "name": "Nebojša Kamber",
       "email": "nebojsa.kamber@4zida.rs"
+    },
+    {
+      "name": "Igor Vidić",
+      "email": "igor.vidic@4zida.rs"
     }
   ],
   "require": {
@@ -20,7 +24,8 @@
     "symfony/serializer": "^5.2",
     "nebkam/zoho-oauth-php": "^2.0",
     "symfony/validator": "^5.2",
-    "symfony/cache": "^5.2"
+    "symfony/cache": "^5.2",
+    "symfony/mime": "^5.2"
   },
   "autoload": {
     "psr-4": {

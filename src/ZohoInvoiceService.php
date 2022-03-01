@@ -2,6 +2,8 @@
 
 namespace Nebkam\ZohoInvoice;
 
+use Exception;
+use Nebkam\ZohoInvoice\Model\AddAttachmentResponse;
 use Nebkam\ZohoInvoice\Model\ApiResponse;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
@@ -16,6 +18,8 @@ use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
 use Nebkam\ZohoOAuth\ZohoOAuthException;
 use Nebkam\ZohoOAuth\ZohoOAuthService;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -203,6 +207,51 @@ class ZohoInvoiceService
 		}
 
 	/**
+	 * @param string $id
+	 * @param string $filePath
+	 * @param string $filename
+	 * @return void
+	 * @throws ZohoInvoiceException
+	 */
+	public function addAttachmentToEstimate(string $id, string $filePath, string $filename): ApiResponse
+		{
+		$formData = new FormDataPart([
+			'attachment'       => DataPart::fromPath($filePath, 'test')
+		]);
+
+		return $this->makeMultipartRequest('POST', sprintf('estimates/%s/attachment', $id), [], ApiResponse::class,  $formData);
+		}
+
+	/**
+	 * @param string $id
+	 * @param string $filePath
+	 * @param string $filename
+	 * @return void
+	 * @throws ZohoInvoiceException
+	 */
+	public function addAttachmentToInvoice(string $id, string $filePath, string $filename): AddAttachmentResponse
+		{
+		$formData = new FormDataPart([
+			'attachment' => DataPart::fromPath($filePath, $filename, 'application/pdf')
+		]);
+		/**
+		 * @var AddAttachmentResponse $response
+		 * @noinspection PhpUnnecessaryLocalVariableInspection
+		 */
+		$response = $this->makeMultipartRequest('POST', sprintf('invoices/%s/attachment', $id), [], AddAttachmentResponse::class, $formData);
+
+		return $response;
+		}
+
+	/**
+	 * @throws ZohoInvoiceException
+	 */
+	public function removeAttachmentFromInvoice(string $id): ApiResponse
+		{
+		return $this->makeDeleteRequest(sprintf('invoices/%s/attachment', $id));
+		}
+
+	/**
 	 * @param string $json
 	 * @return Invoice
 	 * @throws ZohoInvoiceException
@@ -213,6 +262,19 @@ class ZohoInvoiceService
 		$webhook = $this->serializer->deserialize($json, CreateInvoiceWebhook::class);
 
 		return $this->validate($webhook->getInvoice());
+		}
+
+	/**
+	 * @param string $json
+	 * @return AddAttachmentResponse
+	 * @throws ZohoInvoiceException
+	 */
+	public function parseAttachment(string $json): AddAttachmentResponse
+		{
+		/** @var AddAttachmentResponse $webhook */
+		$webhook = $this->serializer->deserialize($json, AddAttachmentResponse::class);
+
+		return $webhook;
 		}
 
 	/**
@@ -255,6 +317,7 @@ class ZohoInvoiceService
 	private function makePostRequest(string $url, ?object $payload, string $responseClass): ApiResponse
 		{
 		$body = $payload ? $this->serializePayload($payload) : [];
+
 		return $this->makeRequest('POST', $url, $body, $responseClass);
 		}
 
@@ -269,6 +332,7 @@ class ZohoInvoiceService
 	private function makePutRequest(string $url, ?object $payload, string $responseClass): ApiResponse
 		{
 		$body = $payload ? $this->serializePayload($payload) : [];
+
 		return $this->makeRequest('PUT', $url, $body, $responseClass);
 		}
 
@@ -320,6 +384,43 @@ class ZohoInvoiceService
 			return $apiResponse;
 			}
 		catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $exception)
+			{
+			throw ZohoInvoiceException::fromHttpClientException($exception);
+			}
+		}
+
+	/**
+	 * @param string $method
+	 * @param string $url
+	 * @param array $options
+	 * @param string $responseClass
+	 * @param FormDataPart $formData
+	 * @return ApiResponse
+	 * @throws ZohoInvoiceException
+	 */
+	private function makeMultipartRequest(string $method, string $url, array $options, string $responseClass, FormDataPart $formData): ApiResponse
+		{
+		$options = array_merge($options, [
+			'headers' => array_merge($this->getHeaders(), $formData->getPreparedHeaders()->toArray()),
+			'body'    => $formData->bodyToIterable()
+		]);
+
+		try
+			{
+			$response = $this->client->request($method, self::BASE_URI . $url, $options);
+			/** @var ApiResponse $apiResponse */
+			$apiResponse = $this->serializer->deserialize(
+				$response->getContent(),
+				$responseClass
+			);
+			if (!$apiResponse->isSuccessful())
+				{
+				throw ZohoInvoiceException::fromResponse($apiResponse);
+				}
+
+			return $apiResponse;
+			}
+		catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|Exception $exception)
 			{
 			throw ZohoInvoiceException::fromHttpClientException($exception);
 			}
