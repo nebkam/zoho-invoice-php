@@ -186,6 +186,13 @@ class ZohoInvoiceService
 		return $response->getInvoice();
 		}
 
+	public function deleteInvoice(Invoice $invoice): ?ApiResponse
+		{
+//		dump($invoice->getInvoiceId());
+//		return null;
+		return $this->makeDeleteRequest(sprintf('invoices/%s', $invoice->getInvoiceId()));
+		}
+
 	/**
 	 * @param string $id
 	 * @return Invoice

@@ -338,7 +338,6 @@ class ZohoInvoiceServiceTest extends TestCase
 	 */
 	public function testCreateInvoice(ZohoInvoiceService $service): array
 		{
-		self::markTestSkipped('Skip until unhardcode customr id and implement cleanup');
 		$invoice        = (new Invoice())
 			->setCustomerId(11978000000028119) /** Demo agency **/
 			->setDate((new DateTime())->format('Y-m-d'))
@@ -353,9 +352,26 @@ class ZohoInvoiceServiceTest extends TestCase
 				->setItemTotal(14152.5)
 				->setDiscount('10%')]);
 		$invoiceCreated = $service->createInvoice($invoice);
+		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
 		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
-		dump($invoiceCreated);
-		return [$service, null];
+
+		return [$service, $invoiceCreated];
+		}
+
+	/**
+	 * @depends testCreateInvoice
+	 * @param array $params
+	 * @return void
+	 */
+	public function testDeleteInvoice(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoice
+		 */
+		[$service, $invoice] = $params;
+		$result = $service->deleteInvoice($invoice);
+		$this->assertTrue($result->isSuccessful());
 		}
 
 	/**
