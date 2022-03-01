@@ -73,7 +73,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group create-invoice
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -89,23 +91,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group cleanup
-	 * @return array
-	 */
-	public function testInitArray(): array
-		{
-		$service = new ZohoInvoiceService(
-			new NativeHttpClient(),
-			self::createValidator(),
-			self::createAuth()
-		);
-		$this->assertNotNull($service);
-
-		return [$service, null, null];
-		}
-
-
-	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testInit
 	 * @param ZohoInvoiceService $service
 	 * @return array
@@ -127,6 +115,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 */
@@ -145,6 +134,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @return array
@@ -166,7 +158,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group create-invoice
+	 * @group invoice
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @return array
@@ -188,7 +180,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
-	 * @group create-invoice
+	 * @group estimate
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @return array
@@ -209,6 +201,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
 	 * @depends testCreateEstimate
 	 * @param array $params
 	 * @return void
@@ -225,6 +218,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group invoice
 	 * @depends testCreateInvoice
 	 * @param array $params
 	 * @return void
@@ -241,6 +235,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testActivateContact
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -259,6 +256,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -282,6 +280,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -300,6 +299,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @return array
@@ -329,6 +331,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContactPerson
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -348,6 +351,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContactPerson
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -370,6 +374,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group contact
 	 * @depends testCreateContactPerson
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -391,6 +396,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testCreateContactPerson
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -407,6 +415,9 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group estimate
+	 * @group invoice
+	 * @group contact
 	 * @depends testCreateContact
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -423,6 +434,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group invoice
 	 * @depends testInit
 	 * @throws ZohoInvoiceException
 	 */
