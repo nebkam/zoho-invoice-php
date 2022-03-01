@@ -149,6 +149,56 @@ class ZohoInvoiceServiceTest extends TestCase
 		}
 
 	/**
+	 * @group create-invoice
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @return array
+	 */
+	public function testCreateInvoice(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+
+		$invoice        = (new Invoice())
+			->setCustomerId($contact->getContactId())
+			->setDate((new DateTime())->format('Y-m-d'))
+			->setReferenceNumber('Test invoice from SDK')
+			->setTotal(16983)
+			->setLineItems([(new LineItem())
+				->setItemId(11978000004734019)
+				->setTaxPercentage(20)
+				->setRate(15725)
+				->setQuantity(1)
+				->setName('Ekskluziv+ 100')
+				->setItemTotal(14152.5)
+				->setDiscount('10%')]);
+		$invoiceCreated = $service->createInvoice($invoice);
+		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
+		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
+
+		return [$service, $invoiceCreated];
+		}
+
+	/**
+	 * @depends testCreateInvoice
+	 * @param array $params
+	 * @return void
+	 */
+	public function testDeleteInvoice(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Invoice $invoice
+		 */
+		[$service, $invoice] = $params;
+		$result = $service->deleteInvoice($invoice);
+		$this->assertTrue($result->isSuccessful());
+		}
+
+	/**
 	 * @depends testActivateContact
 	 * @param array $params
 	 * @throws ZohoInvoiceException
@@ -327,50 +377,6 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 		$result = $service->deleteContact($contact->getContactId());
-		$this->assertTrue($result->isSuccessful());
-		}
-
-	/**
-	 * @group create-invoice
-	 * @depends testInit
-	 * @param ZohoInvoiceService $service
-	 * @return array
-	 */
-	public function testCreateInvoice(ZohoInvoiceService $service): array
-		{
-		$invoice        = (new Invoice())
-			->setCustomerId(11978000000028119) /** Demo agency **/
-			->setDate((new DateTime())->format('Y-m-d'))
-			->setReferenceNumber('Test invoice from SDK')
-			->setTotal(16983)
-			->setLineItems([(new LineItem())
-				->setItemId(11978000004734019)
-				->setTaxPercentage(20)
-				->setRate(15725)
-				->setQuantity(1)
-				->setName('Ekskluziv+ 100')
-				->setItemTotal(14152.5)
-				->setDiscount('10%')]);
-		$invoiceCreated = $service->createInvoice($invoice);
-		$this->assertNotEmpty($invoiceCreated->getInvoiceId());
-		$this->assertNotEmpty($invoiceCreated->getInvoiceNumber());
-
-		return [$service, $invoiceCreated];
-		}
-
-	/**
-	 * @depends testCreateInvoice
-	 * @param array $params
-	 * @return void
-	 */
-	public function testDeleteInvoice(array $params): void
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 * @var Invoice $invoice
-		 */
-		[$service, $invoice] = $params;
-		$result = $service->deleteInvoice($invoice);
 		$this->assertTrue($result->isSuccessful());
 		}
 
