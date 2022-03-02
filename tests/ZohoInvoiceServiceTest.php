@@ -181,6 +181,28 @@ class ZohoInvoiceServiceTest extends TestCase
 
 	/**
 	 * @group estimate
+	 * @depends testCreateContact
+	 * @param array $params
+	 * @return array
+	 */
+	public function testCreateEstimateDemo(array $params): array
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var Contact $contact
+		 */
+		[$service, $contact] = $params;
+		$contact = (new Contact())->setContactId('11978000000028119');
+		$estimatePayload = $this->getExampleEstimate($contact);
+		$estimate        = $service->createEstimate($estimatePayload);
+		$this->assertNotEmpty($estimate->getEstimateId());
+		$this->assertNotEmpty($estimate->getEstimateNumber());
+
+		return [$service, $estimate];
+		}
+
+	/**
+	 * @group estimate
 	 * @depends testCreateEstimate
 	 * @param array $params
 	 * @return array
@@ -767,7 +789,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		return (new Invoice())
 			->setCustomerId($contact->getContactId())
 			->setDate((new DateTime())->format('Y-m-d'))
-			->setReferenceNumber('Test invoice from SDK')
+			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
 				->setItemId(11978000004734019)
@@ -784,7 +806,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		return (new Estimate())
 			->setCustomerId($contact->getContactId())
 			->setDate((new DateTime())->format('Y-m-d'))
-			->setReferenceNumber('Test estimate from SDK')
+			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
 				->setItemId(11978000004734019)
