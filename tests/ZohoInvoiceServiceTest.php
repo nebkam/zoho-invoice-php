@@ -181,28 +181,6 @@ class ZohoInvoiceServiceTest extends TestCase
 
 	/**
 	 * @group estimate
-	 * @depends testCreateContact
-	 * @param array $params
-	 * @return array
-	 */
-	public function testCreateEstimateDemo(array $params): array
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 * @var Contact $contact
-		 */
-		[$service, $contact] = $params;
-		$contact = (new Contact())->setContactId('11978000000028119');
-		$estimatePayload = $this->getExampleEstimate($contact);
-		$estimate        = $service->createEstimate($estimatePayload);
-		$this->assertNotEmpty($estimate->getEstimateId());
-		$this->assertNotEmpty($estimate->getEstimateNumber());
-
-		return [$service, $estimate];
-		}
-
-	/**
-	 * @group estimate
 	 * @depends testCreateEstimate
 	 * @param array $params
 	 * @return array
