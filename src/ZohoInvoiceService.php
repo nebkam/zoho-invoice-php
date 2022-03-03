@@ -253,7 +253,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @param string $filePath
 	 * @param string $filename
-	 * @return void
+	 * @return AddAttachmentResponse
 	 * @throws ZohoInvoiceException
 	 */
 	public function addAttachmentToEstimate(string $id, string $filePath, string $filename): AddAttachmentResponse
@@ -283,7 +283,7 @@ class ZohoInvoiceService
 	 * @param string $id
 	 * @param string $filePath
 	 * @param string $filename
-	 * @return void
+	 * @return AddAttachmentResponse
 	 * @throws ZohoInvoiceException
 	 */
 	public function addAttachmentToInvoice(string $id, string $filePath, string $filename): AddAttachmentResponse
