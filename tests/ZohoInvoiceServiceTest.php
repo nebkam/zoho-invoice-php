@@ -2,6 +2,7 @@
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Nebkam\ZohoInvoice\Model\Attachment;
+use Nebkam\ZohoInvoice\Model\BillingAddress;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\Estimate;
@@ -104,7 +105,13 @@ class ZohoInvoiceServiceTest extends TestCase
 		$data    = (new Contact())
 			->setCompanyName('Demo profil agencije2')
 			->setContactName('Demo profil agencije2')
-			->setWebsite('https://4z.rs');
+			->setWebsite('https://4z.rs')
+			->setBillingAddress((new BillingAddress())
+				->setPhone('38169123456789')
+				->setAddress('Ispod majsnaskog mosta')
+				->setCity('Subotica')
+				->setCountry('Srbija')
+			);
 		$contact = $service->createContact($data);
 		$this->assertNotEmpty($contact->getContactId());
 
@@ -419,6 +426,8 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals($contact->getContactName(), $loadedContact->getContactName());
 		$this->assertEquals($contact->getCompanyName(), $loadedContact->getCompanyName());
 		$this->assertEquals($contact->getWebsite(), $loadedContact->getWebsite());
+		$this->assertNotNull($contact->getBillingAddress());
+		$this->assertEquals($contact->getBillingAddress(), $loadedContact->getBillingAddress());
 		}
 
 	/**

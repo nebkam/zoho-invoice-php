@@ -13,6 +13,10 @@ class Contact
 	private ?string $email = null;
 	private ?string $phone= null;
 	private ?string $website = null;
+	/**
+	 * @var BillingAddress|null
+	 */
+	private ?BillingAddress $billingAddress = null;
 
 	public function getContactId(): ?string
 		{
@@ -65,6 +69,18 @@ class Contact
 	public function getEmail(): ?string
 		{
 		return $this->email;
+		}
+
+	public function getBillingAddress(): ?BillingAddress
+		{
+		return $this->billingAddress;
+		}
+
+	public function setBillingAddress(?BillingAddress $billingAddress): self
+		{
+		$this->billingAddress = $billingAddress;
+
+		return $this;
 		}
 
 	/**
