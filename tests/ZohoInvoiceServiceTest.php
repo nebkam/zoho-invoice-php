@@ -1,6 +1,7 @@
 <?php
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Nebkam\ZohoInvoice\ContextGroup;
 use Nebkam\ZohoInvoice\Model\Attachment;
 use Nebkam\ZohoInvoice\Model\BillingAddress;
 use Nebkam\ZohoInvoice\Model\Contact;
@@ -525,6 +526,25 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertNotEmpty($contact->getContactId());
 		$this->assertEquals('demo.agencija.3@4z.rs', $contact->getEmail());
 		$this->assertEquals('381699876543210', $contact->getPhone());
+		}
+
+	/**
+	 * @group contact
+	 * @depends testCreateContactPerson
+	 * @param array $params
+	 * @throws ZohoInvoiceException
+	 */
+	public function testGetContactPersonList(array $params): void
+		{
+		/**
+		 * @var ZohoInvoiceService $service
+		 * @var ContactPerson $contactPerson
+		 */
+		[$service, $contactPerson] = $params;
+		$loadedContactPerson = $service->getContactPersonList(
+			$contactPerson->getContactId()
+		);
+		$this->assertEquals($loadedContactPerson[0]->getEmail(), $loadedContactPerson[0]->getEmail());
 		}
 
 	/**

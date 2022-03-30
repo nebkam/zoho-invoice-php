@@ -2,6 +2,9 @@
 
 namespace Nebkam\ZohoInvoice\Model;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+use Nebkam\ZohoInvoice\ContextGroup;
+
 class ContactPerson
 	{
 	private ?string $contactId = null;
@@ -11,6 +14,7 @@ class ContactPerson
 	private string $email;
 	private ?string $phone = null;
 	private ?string $mobile = null;
+	private ?bool $isPrimaryContact = null;
 
 	public function getContactId(): ?string
 		{
@@ -36,6 +40,9 @@ class ContactPerson
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_UPDATE})
+	 */
 	public function getFirstName(): string
 		{
 		return $this->firstName;
@@ -48,6 +55,9 @@ class ContactPerson
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_UPDATE})
+	 */
 	public function getLastName(): string
 		{
 		return $this->lastName;
@@ -60,6 +70,9 @@ class ContactPerson
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_UPDATE})
+	 */
 	public function getEmail(): string
 		{
 		return $this->email;
@@ -72,6 +85,9 @@ class ContactPerson
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_UPDATE})
+	 */
 	public function getPhone(): ?string
 		{
 		return $this->phone;
@@ -84,6 +100,9 @@ class ContactPerson
 		return $this;
 		}
 
+	/**
+	 * @Groups({ContextGroup::CONTEXT_UPDATE})
+	 */
 	public function getMobile(): ?string
 		{
 		return $this->mobile;
@@ -92,6 +111,18 @@ class ContactPerson
 	public function setMobile(?string $mobile): self
 		{
 		$this->mobile = $mobile;
+
+		return $this;
+		}
+
+	public function getIsPrimaryContact(): ?bool
+		{
+		return $this->isPrimaryContact;
+		}
+
+	public function setIsPrimaryContact(?bool $isPrimaryContact): self
+		{
+		$this->isPrimaryContact = $isPrimaryContact;
 
 		return $this;
 		}

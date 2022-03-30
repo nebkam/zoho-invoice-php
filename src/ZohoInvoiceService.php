@@ -10,6 +10,7 @@ use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\CreateEstimateWebhook;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
 use Nebkam\ZohoInvoice\Model\Estimate;
+use Nebkam\ZohoInvoice\Model\GetContactPersonListResponse;
 use Nebkam\ZohoInvoice\Model\GetContactPersonResponse;
 use Nebkam\ZohoInvoice\Model\GetContactResponse;
 use Nebkam\ZohoInvoice\Model\GetEstimateResponse;
@@ -143,7 +144,7 @@ class ZohoInvoiceService
 	 */
 	public function updateContactPerson(ContactPerson $contactPerson): ContactPerson
 		{
-		$response = $this->makePutRequest(sprintf('contacts/contactpersons/%s', $contactPerson->getContactPersonId()), $contactPerson, GetContactPersonResponse::class);
+		$response = $this->makePutRequest(sprintf('contacts/contactpersons/%s', $contactPerson->getContactPersonId()), $contactPerson, GetContactPersonResponse::class, ContextGroup::CONTEXT_UPDATE);
 
 		/** @var GetContactPersonResponse $response */
 		return $response->getContactPerson();
@@ -165,6 +166,23 @@ class ZohoInvoiceService
 
 		/** @var GetContactPersonResponse $response */
 		return $response->getContactPerson();
+		}
+
+	/**
+	 * @param string $contactId
+	 * @return ContactPerson[]
+	 * @throws ZohoInvoiceException
+	 * @throws ZohoOAuthException
+	 */
+	public function getContactPersonList(string $contactId): array
+		{
+		$response = $this->makeGetRequest(
+			sprintf('contacts/%s/contactpersons', $contactId),
+			GetContactPersonListResponse::class
+		);
+
+		/** @var GetContactPersonListResponse $response */
+		return $response->getContactPersons();
 		}
 
 	/**
