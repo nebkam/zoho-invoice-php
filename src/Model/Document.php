@@ -4,10 +4,10 @@ namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
 use Exception;
+use Nebkam\ZohoInvoice\ContextGroup;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Nebkam\ZohoInvoice\ContextGroup;
 
 abstract class Document
 	{
@@ -43,6 +43,41 @@ abstract class Document
 	 */
 	private ?string $referenceNumber;
 
+	/**
+	 * @var CustomField[]|null
+	 */
+	private ?array $customFields = null;
+
+	/**
+	 * @return CustomField[]|null
+	 */
+	public function getCustomFields(): ?array
+		{
+		return $this->customFields;
+		}
+
+	public function setCustomFields(?array $customFields): void
+		{
+		$this->customFields = $customFields;
+		}
+
+	public function getDeliveredAt(): ?DateTime
+		{
+		if (empty($this->getCustomFields()))
+			{
+			return null;
+			}
+
+		foreach ($this->getCustomFields() as $field)
+			{
+			if ($field->getApiName() === CustomField::DELIVERED_AT_NAME)
+				{
+				return $field->getAsDateTime();
+				}
+			}
+
+		return null;
+		}
 
 	/**
 	 * @Groups({ContextGroup::CONTEXT_CREATE})

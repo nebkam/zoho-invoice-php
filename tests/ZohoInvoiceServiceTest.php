@@ -6,9 +6,11 @@ use Nebkam\ZohoInvoice\Model\Attachment;
 use Nebkam\ZohoInvoice\Model\BillingAddress;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
+use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
 use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Model\LineItem;
+use Nebkam\ZohoInvoice\Serializer\ApiSerializer;
 use Nebkam\ZohoInvoice\Serializer\NotNullJsonEncoder;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
 use Nebkam\ZohoInvoice\ZohoInvoiceService;
@@ -78,6 +80,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @group estimate
 	 * @group invoice
 	 * @group contact
+	 * @group custom-field
 	 * @return ZohoInvoiceService
 	 */
 	public function testInit(): ZohoInvoiceService
@@ -766,6 +769,41 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
 		$this->assertEquals(28305, $firstItem->getItemTotal());
 		$this->assertEquals($firstItem->getRate() * (100 - $firstItem->getDiscountPercentage()) / 100 * $firstItem->getQuantity(), $firstItem->getItemTotal());
+		}
+
+	/**
+	 * @group webhook-parse-invoice
+	 * @group custom-field
+	 * @throws ZohoInvoiceException
+	 * @throws Exception
+	 */
+	public function testParseInvoiceWithCustomFieldsFromWebhook(): void
+		{
+		$json    = file_get_contents(__DIR__ . '/webhook_payloads/invoice-with-custom-field.json');
+		$serializer = new ApiSerializer();
+
+			/** @var CreateInvoiceWebhook $webhook */
+		$webhook = $serializer->deserialize($json, CreateInvoiceWebhook::class);
+		$invoice = $webhook->getInvoice();
+		$this->assertNotNull($webhook->getInvoice());
+		$this->assertEquals('inv023378', $invoice->getInvoiceNumber());
+		$this->assertEquals('11978000005887043', $invoice->getInvoiceId());
+		$this->assertEquals('11978000005038002', $invoice->getCustomerId());
+		$this->assertEquals(70.000017, $invoice->getDiscountPercent());
+		$this->assertEquals(2076.0, $invoice->getTotal());
+		$this->assertEquals('2022-10-25', $invoice->getDateAsDateTime()->format('Y-m-d'));
+		$this->assertEquals('2022-10-31', $invoice->getDeliveredAt()->format('Y-m-d'));
+		$this->assertNotEmpty($invoice->getLineItems());
+		$lineItems = $invoice->getLineItems();
+		$this->assertCount(1, $lineItems);
+		$firstItem = $lineItems[0];
+		$this->assertEquals('11978000005007481', $firstItem->getItemId());
+		$this->assertEquals(2883.333333, $firstItem->getRate());
+		$this->assertEquals('Klasik 5', $firstItem->getName());
+		$this->assertEquals(70.0, $firstItem->getDiscountPercentage());
+		$this->assertEquals(2, $firstItem->getQuantity());
+		$this->assertEquals(20, $firstItem->getTaxPercentage());
+		$this->assertEquals(1730.0, $firstItem->getItemTotal());
 		}
 
 	/**
