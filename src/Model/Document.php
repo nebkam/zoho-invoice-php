@@ -147,6 +147,28 @@ abstract class Document
 			}
 		}
 
+	/**
+	 * @throws ZohoInvoiceException
+	 */
+	public function getDueDateAsDateTime(int $days = 3): ?DateTime
+		{
+		if (!$this->getDateAsDateTime())
+			{
+			return null;
+			}
+
+		try
+			{
+			$timestamp = strtotime(sprintf($this->getDate(). ' + %d days', $days));
+
+			return (new DateTime())->setTimestamp($timestamp);
+			}
+		catch (Exception $e)
+			{
+			throw ZohoInvoiceException::fromDateTimeException($e);
+			}
+		}
+
 	public function setDate(?string $date): self
 		{
 		$this->date = $date;
