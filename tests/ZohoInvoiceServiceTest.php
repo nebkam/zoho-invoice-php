@@ -737,7 +737,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$lineItems = $invoice->getLineItems();
 		$this->assertCount(4, $lineItems);
 		$firstItem = $lineItems[0];
-		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals('11978000000177386', $firstItem->getItemId());
 		$this->assertEquals(15725, $firstItem->getRate());
 		$this->assertEquals('Ekskluziv+ 100', $firstItem->getName());
 		$this->assertEquals(10, $firstItem->getDiscountPercentage());
@@ -761,7 +761,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals(20, $firstItem->getTaxPercentage());
 		$this->assertEquals(40000, $firstItem->getItemTotal());
 		$firstItem = $lineItems[3];
-		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals('11978000000177386', $firstItem->getItemId());
 		$this->assertEquals(15725, $firstItem->getRate());
 		$this->assertEquals('Ekskluziv+ 100', $firstItem->getName());
 		$this->assertEquals(10, $firstItem->getDiscountPercentage());
@@ -821,7 +821,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$lineItems = $invoice->getLineItems();
 		$this->assertCount(4, $lineItems);
 		$firstItem = $lineItems[3];
-		$this->assertEquals('11978000004734019', $firstItem->getItemId());
+		$this->assertEquals('11978000000177386', $firstItem->getItemId());
 		$this->assertEquals(15725, $firstItem->getRate());
 		$this->assertEquals(10, $firstItem->getDiscountPercentage());
 		$this->assertEquals(14152.5, $firstItem->getPriceWithDiscount());
@@ -838,7 +838,7 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
-				->setItemId(11978000004734019)
+				->setItemId(11978000000177386)
 				->setTaxPercentage(20)
 				->setRate(15725)
 				->setQuantity(1)
@@ -855,7 +855,7 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
-				->setItemId(11978000004734019)
+				->setItemId(11978000000177386)
 				->setTaxPercentage(20)
 				->setRate(15725)
 				->setQuantity(1)
