@@ -10,6 +10,7 @@ class CustomField
 	 * Date field used for passing information when a services are finally delivered to the customer *
 	 */
 	public const DELIVERED_AT_NAME = 'cf_delivered_at';
+	public const REVERSAL_REFERENCE = 'cf_referenca';
 
 	private ?string $label = null;
 	private ?string $apiName = null;

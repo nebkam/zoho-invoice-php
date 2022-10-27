@@ -215,6 +215,26 @@
         "placeholder": "cf_delivered_at",
         "value": "2022-10-31",
         "is_dependent_field": false
+      },
+      {
+        "field_id": "11978000005903057",
+        "customfield_id": "11978000005903057",
+        "show_in_store": false,
+        "show_in_portal": false,
+        "is_active": true,
+        "index": 2,
+        "label": "Referenca",
+        "show_on_pdf": false,
+        "edit_on_portal": false,
+        "edit_on_store": false,
+        "api_name": "cf_referenca",
+        "show_in_all_pdf": false,
+        "value_formatted": "inv023384",
+        "search_entity": "invoice",
+        "data_type": "string",
+        "placeholder": "cf_referenca",
+        "value": "inv023384",
+        "is_dependent_field": false
       }
     ],
     "last_payment_date": "",

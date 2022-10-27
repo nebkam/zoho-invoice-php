@@ -79,6 +79,24 @@ abstract class Document
 		return null;
 		}
 
+	public function getReversalReference(): ?string
+		{
+		if (empty($this->getCustomFields()))
+			{
+			return null;
+			}
+
+		foreach ($this->getCustomFields() as $field)
+			{
+			if ($field->getApiName() === CustomField::REVERSAL_REFERENCE)
+				{
+				return $field->getValue();
+				}
+			}
+
+		return null;
+		}
+
 	/**
 	 * @Groups({ContextGroup::CONTEXT_CREATE})
 	 */
