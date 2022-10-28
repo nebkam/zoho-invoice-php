@@ -3,6 +3,7 @@
 namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
+use DateTimeZone;
 use Exception;
 use Nebkam\ZohoInvoice\ContextGroup;
 use Nebkam\ZohoInvoice\ZohoInvoiceException;
@@ -61,7 +62,7 @@ abstract class Document
 		$this->customFields = $customFields;
 		}
 
-	public function getDeliveredAt(): ?DateTime
+	public function getDeliveredAt(?DateTimeZone $timezone = null): ?DateTime
 		{
 		if (empty($this->getCustomFields()))
 			{
@@ -72,7 +73,7 @@ abstract class Document
 			{
 			if ($field->getApiName() === CustomField::DELIVERED_AT_NAME)
 				{
-				return $field->getAsDateTime();
+				return $field->getAsDateTime($timezone);
 				}
 			}
 
@@ -153,11 +154,11 @@ abstract class Document
 	/**
 	 * @throws ZohoInvoiceException
 	 */
-	public function getDateAsDateTime(): ?DateTime
+	public function getDateAsDateTime(?DateTimeZone $timezone = null): ?DateTime
 		{
 		try
 			{
-			return $this->date !== null ? new DateTime($this->getDate()) : null;
+			return $this->date !== null ? new DateTime($this->getDate(), $timezone) : null;
 			}
 		catch (Exception $e)
 			{
@@ -168,7 +169,7 @@ abstract class Document
 	/**
 	 * @throws ZohoInvoiceException
 	 */
-	public function getDueDateAsDateTime(int $days = 3): ?DateTime
+	public function getDueDateAsDateTime(int $days = 3, ?DateTimeZone $timezone = null): ?DateTime
 		{
 		if (!$this->getDateAsDateTime())
 			{
@@ -178,8 +179,13 @@ abstract class Document
 		try
 			{
 			$timestamp = strtotime(sprintf($this->getDate(). ' + %d days', $days));
+			$date = (new DateTime());
+			if ($timezone)
+				{
+				$date->setTimezone($timezone);
+				}
 
-			return (new DateTime())->setTimestamp($timestamp);
+			return $date->setTimestamp($timestamp);
 			}
 		catch (Exception $e)
 			{

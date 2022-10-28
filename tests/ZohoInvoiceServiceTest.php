@@ -794,7 +794,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals('2022-10-25', $invoice->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertEquals('2022-10-31', $invoice->getDeliveredAt()->format('Y-m-d'));
 		$this->assertEquals('inv023384', $invoice->getReversalReference());
-		$this->assertEquals('2022-10-29', $invoice->getDueDateAsDateTime(4)->format('Y-m-d'));
+		$this->assertEquals('2022-10-29 00:00:00', $invoice->getDueDateAsDateTime(4)->format('Y-m-d H:i:s'));
 		$this->assertNotEmpty($invoice->getLineItems());
 		$lineItems = $invoice->getLineItems();
 		$this->assertCount(1, $lineItems);

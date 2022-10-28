@@ -3,6 +3,7 @@
 namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
+use DateTimeZone;
 
 class CustomField
 	{
@@ -68,11 +69,11 @@ class CustomField
 		return $this;
 		}
 
-	public function getAsDateTime(): ?DateTime
+	public function getAsDateTime(?DateTimeZone $timezone = null): ?DateTime
 		{
 		if ($this->getDataType() === 'date' || $this->getDataType() === 'datetime')
 			{
-			return new DateTime($this->value);
+			return new DateTime($this->value, $timezone);
 			}
 
 		return null;
