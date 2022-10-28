@@ -178,14 +178,7 @@ abstract class Document
 
 		try
 			{
-			$timestamp = strtotime(sprintf($this->getDate(). ' + %d days', $days));
-			$date = (new DateTime());
-			if ($timezone)
-				{
-				$date->setTimezone($timezone);
-				}
-
-			return $date->setTimestamp($timestamp);
+			return (new DateTime($this->getDate(), $timezone))->modify(sprintf( ' + %d days', $days));
 			}
 		catch (Exception $e)
 			{
