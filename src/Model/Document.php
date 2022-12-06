@@ -98,6 +98,24 @@ abstract class Document
 		return null;
 		}
 
+	public function getMonthsInAdvance(): ?string
+		{
+		if (empty($this->getCustomFields()))
+			{
+			return null;
+			}
+
+		foreach ($this->getCustomFields() as $field)
+			{
+			if ($field->getApiName() === CustomField::MONTHS_IN_ADVANCE)
+				{
+				return $field->getValue();
+				}
+			}
+
+		return null;
+		}
+
 	/**
 	 * @Groups({ContextGroup::CONTEXT_CREATE})
 	 */

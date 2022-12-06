@@ -710,6 +710,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		$this->assertEquals('2021-05-24', $estimate->getDateAsDateTime()->format('Y-m-d'));
 		$this->assertEquals(0, $estimate->getDiscountPercent());
 		$this->assertEquals(1200, $estimate->getTotal());
+		$this->assertEquals(3, $estimate->getMonthsInAdvance());
 		$lineItem = $estimate->getLineItems()[0];
 		$this->assertEquals('177517000000038084', $lineItem->getItemId());
 		$this->assertEquals(1000, $lineItem->getRate());

@@ -12,6 +12,7 @@ class CustomField
 	 */
 	public const DELIVERED_AT_NAME = 'cf_delivered_at';
 	public const REVERSAL_REFERENCE = 'cf_referenca';
+	public const MONTHS_IN_ADVANCE = 'cf_avansnih_meseci';
 
 	private ?string $label = null;
 	private ?string $apiName = null;
