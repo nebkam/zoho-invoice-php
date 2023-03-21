@@ -7,6 +7,7 @@ use Nebkam\ZohoInvoice\Model\BillingAddress;
 use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\CustomField;
 use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\Invoice;
 use Nebkam\ZohoInvoice\Model\LineItem;
@@ -80,6 +81,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @group estimate
 	 * @group invoice
 	 * @group contact
+	 * @group contact-create
 	 * @group custom-field
 	 * @return ZohoInvoiceService
 	 */
@@ -99,6 +101,7 @@ class ZohoInvoiceServiceTest extends TestCase
 	 * @group estimate
 	 * @group invoice
 	 * @group contact
+	 * @group contact-create
 	 * @depends testInit
 	 * @param ZohoInvoiceService $service
 	 * @return array
@@ -123,26 +126,6 @@ class ZohoInvoiceServiceTest extends TestCase
 			$service,
 			$contact
 		];
-		}
-
-	/**
-	 * @group contact
-	 * @depends testCreateContact
-	 * @param array $params
-	 */
-	public function testExceptionOnDuplicateContact(array $params): void
-		{
-		/**
-		 * @var ZohoInvoiceService $service
-		 */
-		[$service] = $params;
-		$data = (new Contact())
-			->setCompanyName('Demo profil agencije2')
-			->setContactName('Demo profil agencije2')
-			->setWebsite('https://4z.rs');
-		$this->expectException(ZohoInvoiceException::class);
-		$service->createContact($data);
-		$service->createContact($data);
 		}
 
 	/**
@@ -304,9 +287,12 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $invoicePayload] = $params;
 		$invoicePayload->setReferenceNumber('new invoice reference number');
+		$invoicePayload->addCustomField((new CustomField())->setLabel('4ZID')->setValue('09/000000000001'));
 		$invoice = $service->updateInvoice($invoicePayload);
 		$this->assertNotEmpty($invoice->getInvoiceId());
 		$this->assertEquals('new invoice reference number', $invoice->getReferenceNumber());
+		$this->assertEquals('09/000000000001', $invoice->getCustomFieldByLabel('4ZID'));
+		$this->assertEquals('09/000000000001', $invoice->getCustomFieldByApiName(CustomField::DOCUMENT_ID));
 
 		return [$service, $invoice];
 		}

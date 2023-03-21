@@ -50,6 +50,10 @@ abstract class Document
 	private ?array $customFields = null;
 
 	/**
+	 * @Groups({
+	 *     ContextGroup::CONTEXT_CREATE
+	 *     })
+	 *
 	 * @return CustomField[]|null
 	 */
 	public function getCustomFields(): ?array
@@ -60,6 +64,47 @@ abstract class Document
 	public function setCustomFields(?array $customFields): void
 		{
 		$this->customFields = $customFields;
+		}
+
+	public function addCustomField(CustomField $customField): self
+		{
+		$this->customFields[] = $customField;
+
+		return $this;
+		}
+
+	public function getCustomFieldByLabel(string $label)
+		{
+		if (empty($this->getCustomFields()))
+			{
+			return null;
+			}
+
+		foreach ($this->getCustomFields() as $field)
+			{
+			if ($field->getLabel() === $label)
+				{
+				return $field->getValue();
+				}
+			}
+		return null;
+		}
+
+	public function getCustomFieldByApiName(string $apiName)
+		{
+		if (empty($this->getCustomFields()))
+			{
+			return null;
+			}
+
+		foreach ($this->getCustomFields() as $field)
+			{
+			if ($field->getApiName() === $apiName)
+				{
+				return $field->getValue();
+				}
+			}
+		return null;
 		}
 
 	public function getDeliveredAt(?DateTimeZone $timezone = null): ?DateTime
@@ -196,7 +241,7 @@ abstract class Document
 
 		try
 			{
-			return (new DateTime($this->getDate(), $timezone))->modify(sprintf( ' + %d days', $days));
+			return (new DateTime($this->getDate(), $timezone))->modify(sprintf(' + %d days', $days));
 			}
 		catch (Exception $e)
 			{

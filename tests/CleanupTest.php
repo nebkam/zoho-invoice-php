@@ -62,7 +62,7 @@ class CleanupTest extends TestCase
 			getenv('CLIENT_SECRET'),
 			getenv('CREDENTIALS_PATH')
 		);
-		$auth->refreshAccessToken();
+//		$auth->refreshAccessToken();
 
 		return $auth;
 		}
@@ -130,7 +130,7 @@ class CleanupTest extends TestCase
 	 */
 	public function testCleanupContactPerson(ZohoInvoiceService $service): void
 		{
-		$contactPersonId = 'CHNAGE ME';
+		$contactPersonId = 'CHANGE ME';
 		$result  = $service->deleteContactPerson($contactPersonId);
 		$this->assertTrue($result->isSuccessful());
 		}

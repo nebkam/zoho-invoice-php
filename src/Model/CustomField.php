@@ -4,6 +4,8 @@ namespace Nebkam\ZohoInvoice\Model;
 
 use DateTime;
 use DateTimeZone;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Nebkam\ZohoInvoice\ContextGroup;
 
 class CustomField
 	{
@@ -13,6 +15,7 @@ class CustomField
 	public const DELIVERED_AT_NAME = 'cf_delivered_at';
 	public const REVERSAL_REFERENCE = 'cf_referenca';
 	public const MONTHS_IN_ADVANCE = 'cf_avansnih_meseci';
+	public const DOCUMENT_ID = 'cf_zid';
 
 	private ?string $label = null;
 	private ?string $apiName = null;
@@ -24,6 +27,11 @@ class CustomField
 		return $this->label;
 		}
 
+	/**
+	 * @Groups({
+	 *     ContextGroup::CONTEXT_CREATE
+	 *     })
+	 */
 	public function setLabel(?string $label): self
 		{
 		$this->label = $label;
@@ -43,6 +51,12 @@ class CustomField
 		return $this;
 		}
 
+
+	/**
+	 * @Groups({
+	 *     ContextGroup::CONTEXT_CREATE
+	 *     })
+	 */
 	public function getValue(): ?string
 		{
 		return $this->value;

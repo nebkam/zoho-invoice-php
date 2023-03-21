@@ -9,6 +9,7 @@ use Nebkam\ZohoInvoice\Model\Contact;
 use Nebkam\ZohoInvoice\Model\ContactPerson;
 use Nebkam\ZohoInvoice\Model\CreateEstimateWebhook;
 use Nebkam\ZohoInvoice\Model\CreateInvoiceWebhook;
+use Nebkam\ZohoInvoice\Model\CustomField;
 use Nebkam\ZohoInvoice\Model\Estimate;
 use Nebkam\ZohoInvoice\Model\GetContactPersonListResponse;
 use Nebkam\ZohoInvoice\Model\GetContactPersonResponse;
@@ -207,7 +208,6 @@ class ZohoInvoiceService
 	public function updateInvoice(Invoice $invoice): Invoice
 		{
 		$response = $this->makePutRequest(sprintf('invoices/%s', $invoice->getInvoiceId()), $invoice,GetInvoiceResponse::class, ContextGroup::CONTEXT_CREATE);
-
 		/** @var GetInvoiceResponse $response */
 		return $response->getInvoice();
 		}
@@ -448,7 +448,7 @@ class ZohoInvoiceService
 			$response = $this->client->request($method, self::BASE_URI . $url, $options);
 			/** @var ApiResponse $apiResponse */
 			$apiResponse = $this->serializer->deserialize(
-				$response->getContent(),
+				$response->getContent(false),
 				$responseClass
 			);
 			if (!$apiResponse->isSuccessful())
