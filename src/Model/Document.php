@@ -29,7 +29,6 @@ abstract class Document
 	private ?float $total;
 	/**
 	 * @Assert\NotNull()
-	 * @Assert\Date()
 	 * @var string|null
 	 */
 	private ?string $date;
