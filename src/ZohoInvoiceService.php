@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ZohoInvoiceService
 	{
-	private const BASE_URI = 'https://invoice.zoho.eu/api/v3/';
+	private const BASE_URI = 'https://www.zohoapis.eu/invoice/v3/';
 	private ApiSerializer $serializer;
 	private HttpClientInterface $client;
 	private ValidatorInterface $validator;
