@@ -166,7 +166,7 @@ class ZohoInvoiceServiceTest extends TestCase
 		 */
 		[$service, $contact] = $params;
 		$estimatePayload = $this->getExampleEstimate($contact);
-		$estimate        = $service->createEstimate($estimatePayload);
+		$estimate        = $service->createEstimate($estimatePayload, true);
 		$this->assertNotEmpty($estimate->getEstimateId());
 		$this->assertNotEmpty($estimate->getEstimateNumber());
 
@@ -813,11 +813,11 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
-				->setItemId(11978000000177386)
+				->setItemId(11978000006430469)
 				->setTaxPercentage(20)
 				->setRate(15725)
 				->setQuantity(1)
-				->setName('Ekskluziv+ 100')
+				->setName('Mini 100')
 				->setItemTotal(14152.5)
 				->setDiscount('10%')]);
 		}
@@ -831,11 +831,11 @@ class ZohoInvoiceServiceTest extends TestCase
 			->setReferenceNumber('TEST-WITHOUT-WEBHOOK')
 			->setTotal(16983)
 			->setLineItems([(new LineItem())
-				->setItemId(11978000000177386)
+				->setItemId(11978000006430469)
 				->setTaxPercentage(20)
 				->setRate(15725)
 				->setQuantity(1)
-				->setName('Ekskluziv+ 100')
+				->setName('Mini 100')
 				->setItemTotal(14152.5)
 				->setDiscount('10%')]);
 		}

@@ -217,9 +217,10 @@ class ZohoInvoiceService
 		return $this->makeDeleteRequest(sprintf('invoices/%s', $invoice->getInvoiceId()));
 		}
 
-	public function createEstimate(Estimate $estimate): Estimate
+	public function createEstimate(Estimate $estimate, ?bool $ignoreAutoNumberGeneration = null): Estimate
 		{
-		$response = $this->makePostRequest('estimates', $estimate,GetEstimateResponse::class, ContextGroup::CONTEXT_CREATE);
+		$url = $ignoreAutoNumberGeneration ? 'estimates?ignore_auto_number_generation=true': 'estimates';
+		$response = $this->makePostRequest($url, $estimate,GetEstimateResponse::class, ContextGroup::CONTEXT_CREATE);
 
 		/** @var GetEstimateResponse $response */
 		return $response->getEstimate();
